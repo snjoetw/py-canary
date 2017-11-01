@@ -18,6 +18,7 @@ URL_LOGIN_API = "https://my.canary.is/api/auth/login"
 URL_ME_API = "https://my.canary.is/api/customers/me"
 URL_LOCATIONS_API = "https://my.canary.is/api/locations"
 URL_READINGS_API = "https://my.canary.is/api/readings?deviceId={}&type={}"
+URL_ENTRIES_API = "https://my.canary.is/api/entries/{}?entry_type={}&limit={}&offset=0"
 
 ATTR_USERNAME = "username"
 ATTR_EMAIL = "email"
@@ -102,6 +103,23 @@ class Api:
 
         return readings
 
+    def get_entries(self, location_id, entry_type="motion", limit=6):
+        r = self._http_get(URL_ENTRIES_API.format(location_id, entry_type, limit), headers={
+            HEADER_XSRF_TOKEN: self._xsrf_token,
+            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
+        }, cookies={
+            COOKIE_XSRF_TOKEN: self._xsrf_token,
+            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
+        })
+
+        entries = []
+
+        for entry_json in r.json():
+          entries.append(Entry(entry_json))
+
+        return entries
+
+  
     def _http_get(self, url, params=None, **kwargs):
         r = requests.get(url, params, **kwargs)
         status = r.status_code
