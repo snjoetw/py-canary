@@ -18,6 +18,7 @@ URL_LOGIN_API = "https://my.canary.is/api/auth/login"
 URL_ME_API = "https://my.canary.is/api/customers/me"
 URL_LOCATIONS_API = "https://my.canary.is/api/locations"
 URL_READINGS_API = "https://my.canary.is/api/readings?deviceId={}&type={}"
+URL_ENTRIES_API = "https://my.canary.is/api/entries/{}?entry_type={}&limit={}&offset=0"
 
 ATTR_USERNAME = "username"
 ATTR_EMAIL = "email"
@@ -73,17 +74,7 @@ class Api:
             COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
         })
 
-        locations = []
-
-        for location_json in r.json():
-            devices_json = location_json["devices"]
-            devices = []
-            for device_json in devices_json:
-                devices.append(Device(device_json))
-
-            locations.append(Location(location_json, devices))
-
-        return locations
+        return [Location(data) for data in r.json()]
 
     def get_readings(self, device):
         r = self._http_get(
@@ -96,11 +87,18 @@ class Api:
                 COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
             })
 
-        readings = []
-        for reading_json in r.json():
-            readings.append(Reading(reading_json))
+        return [Reading(data) for data in r.json()]
 
-        return readings
+    def get_entries(self, location_id, entry_type="motion", limit=6):
+        r = self._http_get(URL_ENTRIES_API.format(location_id, entry_type, limit), headers={
+            HEADER_XSRF_TOKEN: self._xsrf_token,
+            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
+        }, cookies={
+            COOKIE_XSRF_TOKEN: self._xsrf_token,
+            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
+        })
+
+        return [Entry(data) for data in r.json()]
 
     def _http_get(self, url, params=None, **kwargs):
         r = requests.get(url, params, **kwargs)
@@ -138,13 +136,16 @@ class Customer:
 
 
 class Location:
-    def __init__(self, data, devices):
+    def __init__(self, data):
         self._id = data["id"]
         self._name = data["name"]
         self._resource_uri = data["resource_uri"]
-        self._devices = devices
         self._location_mode = LocationMode(data["mode"])
         self._is_private = data["is_private"]
+        self._devices = []
+
+        for device_data in data["devices"]:
+            self._devices.append(Device(device_data))
 
     @property
     def location_id(self):
@@ -180,6 +181,7 @@ class LocationMode(Enum):
 class Device:
     def __init__(self, data):
         self._id = data["id"]
+        self._uuid = data["uuid"]
         self._name = data["name"]
         self._device_mode = DeviceMode(data["device_mode"])
         self._is_online = data["online"]
@@ -188,6 +190,10 @@ class Device:
     @property
     def device_id(self):
         return self._id
+
+    @property
+    def uuid(self):
+        return self._uuid
 
     @property
     def name(self):
@@ -235,3 +241,64 @@ class SensorType(Enum):
     AIR_QUALITY = "air_quality"
     HUMIDITY = "humidity"
     TEMPERATURE = "temperature"
+
+
+class Entry:
+    def __init__(self, data):
+        self._entry_id = data["id"]
+        self._description = data["description"]
+        self._device_uuids = data["device_uuids"]
+        self._entry_type = data["entry_type"]
+        self._start_time = data["start_time"]
+        self._end_time = data["end_time"]
+        self._thumbnails_by_device_uuid = {}
+
+        for thumbnail_data in data["thumbnails"]:
+            thumbnail = Thumbnail(thumbnail_data)
+            self._thumbnails_by_device_uuid[thumbnail.device_uuid] = thumbnail
+
+    @property
+    def entry_id(self):
+        return self._entry_id
+
+    @property
+    def description(self):
+        return self._description
+
+    @property
+    def device_uuids(self):
+        return self._device_uuids
+
+    @property
+    def entry_type(self):
+        return self._entry_type
+
+    @property
+    def start_time(self):
+        return self._start_time
+
+    @property
+    def end_time(self):
+        return self._end_time
+
+    @property
+    def thumbnails(self):
+        return self._thumbnails_by_device_uuid.values()
+
+    @property
+    def thumbnail(self, device_uuid):
+        return self._thumbnails_by_device_uuid[device_uuid]
+
+
+class Thumbnail:
+    def __init__(self, data):
+        self._device_uuid = data["device_uuid"]
+        self._image_url = data["image_url"]
+
+    @property
+    def device_uuid(self):
+        return self._device_uuid
+
+    @property
+    def image_url(self):
+        return self._image_url
