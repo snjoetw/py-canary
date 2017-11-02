@@ -251,11 +251,10 @@ class Entry:
         self._entry_type = data["entry_type"]
         self._start_time = data["start_time"]
         self._end_time = data["end_time"]
-        self._thumbnails_by_device_uuid = {}
+        self._thumbnails = []
 
         for thumbnail_data in data["thumbnails"]:
-            thumbnail = Thumbnail(thumbnail_data)
-            self._thumbnails_by_device_uuid[thumbnail.device_uuid] = thumbnail
+            self._thumbnails.append(Thumbnail(thumbnail_data))
 
     @property
     def entry_id(self):
@@ -283,11 +282,7 @@ class Entry:
 
     @property
     def thumbnails(self):
-        return self._thumbnails_by_device_uuid.values()
-
-    @property
-    def thumbnail(self, device_uuid):
-        return self._thumbnails_by_device_uuid[device_uuid]
+        return self._thumbnails
 
 
 class Thumbnail:
