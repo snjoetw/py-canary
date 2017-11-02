@@ -15,13 +15,12 @@ HEADER_VALUE_AUTHORIZATION = "Bearer {}"
 
 URL_LOGIN_PAGE = "https://my.canary.is/login"
 URL_LOGIN_API = "https://my.canary.is/api/auth/login"
-URL_ME_API = "https://my.canary.is/api/customers/me"
+URL_ME_API = "https://my.canary.is/api/customers/me?email={}"
 URL_LOCATIONS_API = "https://my.canary.is/api/locations"
 URL_READINGS_API = "https://my.canary.is/api/readings?deviceId={}&type={}"
 URL_ENTRIES_API = "https://my.canary.is/api/entries/{}?entry_type={}&limit={}&offset=0"
 
 ATTR_USERNAME = "username"
-ATTR_EMAIL = "email"
 ATTR_PASSWORD = "password"
 
 
@@ -53,62 +52,48 @@ class Api:
         self._xsrf_token = xsrf_token
 
     def get_me(self):
-        r = self._http_get(URL_ME_API, headers={
-            HEADER_XSRF_TOKEN: self._xsrf_token,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
-        }, cookies={
-            COOKIE_XSRF_TOKEN: self._xsrf_token,
-            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
-        }, params={
-            ATTR_EMAIL: self._username
-        })
+        r = requests.get(URL_ME_API.format(self._username),
+                         headers=self._api_headers(),
+                         cookies=self._api_cookies())
+        r.raise_for_status()
 
         return Customer(r.json())
 
     def get_locations(self):
-        r = self._http_get(URL_LOCATIONS_API, headers={
-            HEADER_XSRF_TOKEN: self._xsrf_token,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
-        }, cookies={
-            COOKIE_XSRF_TOKEN: self._xsrf_token,
-            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
-        })
+        r = requests.get(URL_LOCATIONS_API,
+                         headers=self._api_headers(),
+                         cookies=self._api_cookies())
+        r.raise_for_status()
 
         return [Location(data) for data in r.json()]
 
     def get_readings(self, device):
-        r = self._http_get(
-            URL_READINGS_API.format(device.device_id, device.device_type),
-            headers={
-                HEADER_XSRF_TOKEN: self._xsrf_token,
-                HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
-            }, cookies={
-                COOKIE_XSRF_TOKEN: self._xsrf_token,
-                COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
-            })
+        r = requests.get(URL_READINGS_API.format(device.device_id, device.device_type),
+                         headers=self._api_headers(),
+                         cookies=self._api_cookies())
+        r.raise_for_status()
 
         return [Reading(data) for data in r.json()]
 
     def get_entries(self, location_id, entry_type="motion", limit=6):
-        r = self._http_get(URL_ENTRIES_API.format(location_id, entry_type, limit), headers={
-            HEADER_XSRF_TOKEN: self._xsrf_token,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
-        }, cookies={
-            COOKIE_XSRF_TOKEN: self._xsrf_token,
-            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
-        })
+        r = requests.get(URL_ENTRIES_API.format(location_id, entry_type, limit),
+                         headers=self._api_headers(),
+                         cookies=self._api_cookies())
+        r.raise_for_status()
 
         return [Entry(data) for data in r.json()]
 
-    def _http_get(self, url, params=None, **kwargs):
-        r = requests.get(url, params, **kwargs)
-        status = r.status_code
+    def _api_cookies(self):
+        return {
+            COOKIE_XSRF_TOKEN: self._xsrf_token,
+            COOKIE_SSESYRANAC: COOKIE_VALUE_SSESYRANAC.format(self._token)
+        }
 
-        if str(status).startswith('4'):
-            self.login()
-            r = requests.get(url, params, **kwargs)
-
-        return r
+    def _api_headers(self):
+        return {
+            HEADER_XSRF_TOKEN: self._xsrf_token,
+            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
+        }
 
 
 class Customer:
