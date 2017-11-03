@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 import requests
@@ -22,6 +23,8 @@ URL_ENTRIES_API = "https://my.canary.is/api/entries/{}?entry_type={}&limit={}&of
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Api:
@@ -57,6 +60,8 @@ class Api:
                          cookies=self._api_cookies())
         r.raise_for_status()
 
+        _LOGGER.debug("Received get_me API response: {}".format(r.json()))
+
         return Customer(r.json())
 
     def get_locations(self):
@@ -64,6 +69,9 @@ class Api:
                          headers=self._api_headers(),
                          cookies=self._api_cookies())
         r.raise_for_status()
+
+        _LOGGER.debug(
+            "Received get_locations API response: {}".format(r.json()))
 
         return [Location(data) for data in r.json()]
 
@@ -74,6 +82,9 @@ class Api:
             cookies=self._api_cookies())
         r.raise_for_status()
 
+        _LOGGER.debug(
+            "Received get_readings API response: {}".format(r.json()))
+
         return [Reading(data) for data in r.json()]
 
     def get_entries(self, location_id, entry_type="motion", limit=6):
@@ -82,6 +93,8 @@ class Api:
             headers=self._api_headers(),
             cookies=self._api_cookies())
         r.raise_for_status()
+
+        _LOGGER.debug("Received get_entries API response: {}".format(r.json()))
 
         return [Entry(data) for data in r.json()]
 
