@@ -68,17 +68,19 @@ class Api:
         return [Location(data) for data in r.json()]
 
     def get_readings(self, device):
-        r = requests.get(URL_READINGS_API.format(device.device_id, device.device_type),
-                         headers=self._api_headers(),
-                         cookies=self._api_cookies())
+        r = requests.get(
+            URL_READINGS_API.format(device.device_id, device.device_type),
+            headers=self._api_headers(),
+            cookies=self._api_cookies())
         r.raise_for_status()
 
         return [Reading(data) for data in r.json()]
 
     def get_entries(self, location_id, entry_type="motion", limit=6):
-        r = requests.get(URL_ENTRIES_API.format(location_id, entry_type, limit),
-                         headers=self._api_headers(),
-                         cookies=self._api_cookies())
+        r = requests.get(
+            URL_ENTRIES_API.format(location_id, entry_type, limit),
+            headers=self._api_headers(),
+            cookies=self._api_cookies())
         r.raise_for_status()
 
         return [Entry(data) for data in r.json()]
@@ -92,7 +94,8 @@ class Api:
     def _api_headers(self):
         return {
             HEADER_XSRF_TOKEN: self._xsrf_token,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(self._token)
+            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(
+                self._token)
         }
 
 
@@ -125,7 +128,8 @@ class Location:
         self._id = data["id"]
         self._name = data["name"]
         self._resource_uri = data["resource_uri"]
-        self._location_mode = LocationMode(data["mode"])
+        self._location_mode = None if data["mode"] is None \
+            else LocationMode(data["mode"])
         self._is_private = data["is_private"]
         self._devices = []
 
@@ -168,7 +172,8 @@ class Device:
         self._id = data["id"]
         self._uuid = data["uuid"]
         self._name = data["name"]
-        self._device_mode = DeviceMode(data["device_mode"])
+        self._device_mode = None if data["device_mode"] is None \
+            else DeviceMode(data["device_mode"])
         self._is_online = data["online"]
         self._device_type = data["device_type"]
 
