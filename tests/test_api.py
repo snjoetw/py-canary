@@ -56,6 +56,7 @@ class TestApi(unittest.TestCase):
             if location.name == "Vacation Home":
                 self.assertTrue(location.is_recording)
                 self.assertFalse(location.is_private)
+                self.assertTrue(location.is_celsius)
                 self.assertEqual(2, len(location.customers))
                 self.assertEqual("away", location.mode.name)
                 self.assertEqual("armed", location.current_mode.name)
@@ -63,6 +64,7 @@ class TestApi(unittest.TestCase):
             elif location.name == "Home":
                 self.assertFalse(location.is_recording)
                 self.assertFalse(location.is_private)
+                self.assertFalse(location.is_celsius)
                 self.assertEqual(1, len(location.customers))
                 self.assertEqual("home", location.mode.name)
                 self.assertEqual("standby", location.current_mode.name)

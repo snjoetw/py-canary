@@ -132,7 +132,7 @@
       },
       "customers": [
         {
-          "celsius": true,
+          "celsius": false,
           "current_location": "/v1/locations/70002/",
           "first_name": "Joe",
           "id": 90001,

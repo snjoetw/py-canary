@@ -235,6 +235,14 @@ class Location:
 
         return self.current_mode.name in RECORDING_STATES
 
+    @property
+    def is_celsius(self):
+        for customer in self._customers:
+            if customer is not None and customer.is_celsius:
+                return True
+
+        return False
+
 
 class Device:
     def __init__(self, data):
