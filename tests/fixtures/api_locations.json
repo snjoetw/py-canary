@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "limit": 20,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total_count": 2
+  },
+  "objects": [
+    {
+      "auto_mode": {
+        "id": 1,
+        "name": "disarmed",
+        "resource_uri": "/v1/modes/1/"
+      },
+      "auto_mode_enabled": true,
+      "current_mode": {
+        "id": 2,
+        "name": "armed",
+        "resource_uri": "/v1/modes/2/"
+      },
+      "customers": [
+        {
+          "celsius": true,
+          "current_location": "/v1/locations/70002/",
+          "first_name": "Joe",
+          "id": 90001,
+          "is_active": true,
+          "last_name": "Lu"
+        },
+        {
+          "celsius": true,
+          "current_location": null,
+          "first_name": "Jenny",
+          "has_seen_data_share_prompt": false,
+          "id": 90002,
+          "is_active": true,
+          "last_name": "Chen"
+        }
+      ],
+      "devices": [
+        {
+          "activation_attempts": 1,
+          "activation_status": "activated",
+          "activation_token": null,
+          "device_activated": true,
+          "device_type": {
+            "id": 1,
+            "name": "Canary"
+          },
+          "id": 80001,
+          "last_video_received": null,
+          "location": "/v1/locations/70001/",
+          "mode": "/v1/modes/2/",
+          "name": "Dining Room",
+          "online": true,
+          "siren_active": false,
+          "video_uploading": false
+        },
+        {
+          "activation_attempts": 1,
+          "activation_status": "deactivated",
+          "activation_token": null,
+          "device_activated": false,
+          "device_type": {
+            "id": 1,
+            "name": "Canary"
+          },
+          "id": 80002,
+          "image_url": null,
+          "last_video_received": null,
+          "location": "/v1/locations/70001/",
+          "mode": "/v1/modes/1/",
+          "name": "Front Door",
+          "online": false,
+          "siren_active": false,
+          "video_uploading": true
+        },
+        {
+          "activation_attempts": 2,
+          "activation_status": "deactivated",
+          "activation_token": null,
+          "device_activated": false,
+          "device_type": {
+            "id": 1,
+            "name": "Canary"
+          },
+          "firmware_version": "v0.2.42",
+          "id": 80003,
+          "image_url": "https://cnry-prod-videos.s3.amazonaws.com/ac9f712d36904b7fab3acc013688c731/1509616386-608x1080%3A100.png?Signature=zBHG%2BqGnQnaKVlYyKO28mHfTOPU%3D&Expires=1898495204&AWSAccessKeyId=ASIAJUTIIPBZ7AJOL6DA&x-amz-security-token=FQoDYXdzELj//////////wEaDGGRiq41vUyz0y/smCK3AxORupBqm2kYpjUQsIbHyfYxn5Tm0HFfx2CbzZObzTsbOiUo3STWIy1M4Kc3qWH4TtJvZPyNoe%2BJPa3RtasTs8h3jM4Lx5HGGGuVjGtTjFVKGI3JRmbfKbAziIMmWtwh9vor3awBlQLYeZrUYnbAwMx7R%2BuTQFR8qkipOQhsAu2MRzrrs2BuHy1ebDYDureKcB4SOXfYR8xSGYCudG0XLVnu%2BHFwi5qiYayoH4UadduwxwMQEZCX4w32Ry2e529Cggur723yomH1j3VEAg1jQ97PSuFFaTkxAUPT7V%2BvNeDH84A47Eubtux04sNa/VGLFtun%2BwZEdUXLjdTBy5Czk0TYl/oqfS6ZZv6wjS%2BtLD8B0z/F%2BIruvw%2BZtj3Wlr1e5RCjnUFcSEbYv0Z3ezaipS5EGanvyYn8UqkNyj8X0FHek0COOBR89EsppicUGxlVjC0oP6utZGo7mJi3UgAHmXfqALETQTon3%2BOMFGwXe8MsCi4y%2Bg7p/OAwPa/g1GDOr2qZ/zY8w474IkNlb9NzEkT4K1JswTkoSu4TAd7sVODBQLnss7oQGxChhlg9x84cNf8VKDM4asso9dPE0AU%3D",
+          "last_video_received": null,
+          "location": "/v1/locations/70001/",
+          "mode": "/v1/modes/2/",
+          "name": "Bedroom",
+          "online": false,
+          "siren_active": false,
+          "video_uploading": true
+        },
+        {
+          "activation_attempts": 1,
+          "activation_status": "activated",
+          "activation_token": null,
+          "device_activated": true,
+          "device_type": {
+            "id": 1,
+            "name": "Canary"
+          },
+          "id": 80004,
+          "image_url": "https://cnry-prod-videos.s3.amazonaws.com/a4f7326693044d5694212ab019a6ddf6/1511074544-608x1080%3A100.png?Signature=GlU2V1be4C%2F1GoAXcnSKegE1Yo4%3D&Expires=1898495204&AWSAccessKeyId=ASIAJUTIIPBZ7AJOL6DA&x-amz-security-token=FQoDYXdzELj//////////wEaDGGRiq41vUyz0y/smCK3AxORupBqm2kYpjUQsIbHyfYxn5Tm0HFfx2CbzZObzTsbOiUo3STWIy1M4Kc3qWH4TtJvZPyNoe%2BJPa3RtasTs8h3jM4Lx5HGGGuVjGtTjFVKGI3JRmbfKbAziIMmWtwh9vor3awBlQLYeZrUYnbAwMx7R%2BuTQFR8qkipOQhsAu2MRzrrs2BuHy1ebDYDureKcB4SOXfYR8xSGYCudG0XLVnu%2BHFwi5qiYayoH4UadduwxwMQEZCX4w32Ry2e529Cggur723yomH1j3VEAg1jQ97PSuFFaTkxAUPT7V%2BvNeDH84A47Eubtux04sNa/VGLFtun%2BwZEdUXLjdTBy5Czk0TYl/oqfS6ZZv6wjS%2BtLD8B0z/F%2BIruvw%2BZtj3Wlr1e5RCjnUFcSEbYv0Z3ezaipS5EGanvyYn8UqkNyj8X0FHek0COOBR89EsppicUGxlVjC0oP6utZGo7mJi3UgAHmXfqALETQTon3%2BOMFGwXe8MsCi4y%2Bg7p/OAwPa/g1GDOr2qZ/zY8w474IkNlb9NzEkT4K1JswTkoSu4TAd7sVODBQLnss7oQGxChhlg9x84cNf8VKDM4asso9dPE0AU%3D",
+          "last_video_received": null,
+          "location": "/v1/locations/70001/",
+          "mode": "/v1/modes/2/",
+          "name": "Front Door",
+          "online": true,
+          "siren_active": false,
+          "video_uploading": false
+        }
+      ],
+      "id": 70001,
+      "is_private": false,
+      "mode": {
+        "id": 5,
+        "name": "away",
+        "resource_uri": "/v1/modes/5/"
+      },
+      "name": "Vacation Home",
+      "night_mode_enabled": true
+    },
+    {
+      "auto_mode": {
+        "id": 4,
+        "name": "home",
+        "resource_uri": "/v1/modes/4/"
+      },
+      "auto_mode_enabled": false,
+      "current_mode": {
+        "id": 7,
+        "name": "standby",
+        "resource_uri": "/v1/modes/7/"
+      },
+      "customers": [
+        {
+          "celsius": true,
+          "current_location": "/v1/locations/70002/",
+          "first_name": "Joe",
+          "id": 90001,
+          "is_active": true,
+          "last_name": "Lu"
+        }
+      ],
+      "devices": [
+        {
+          "activation_attempts": 1,
+          "activation_status": "activated",
+          "activation_token": null,
+          "device_activated": true,
+          "device_type": {
+            "id": 1,
+            "name": "Canary"
+          },
+          "id": 80005,
+          "last_video_received": null,
+          "location": "/v1/locations/70002/",
+          "mode": "/v1/modes/7/",
+          "name": "Office",
+          "online": true,
+          "siren_active": false,
+          "video_uploading": true
+        }
+      ],
+      "id": 70002,
+      "is_private": false,
+      "mode": {
+        "id": 4,
+        "name": "home",
+        "resource_uri": "/v1/modes/4/"
+      },
+      "name": "Home",
+      "night_mode_enabled": false
+    }
+  ]
+}

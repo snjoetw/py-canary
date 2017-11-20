@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "limit": 20,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total_count": 7
+  },
+  "objects": [
+    {
+      "id": 2,
+      "name": "armed",
+      "resource_uri": "/v1/modes/2/"
+    },
+    {
+      "id": 5,
+      "name": "away",
+      "resource_uri": "/v1/modes/5/"
+    },
+    {
+      "id": 1,
+      "name": "disarmed",
+      "resource_uri": "/v1/modes/1/"
+    },
+    {
+      "id": 4,
+      "name": "home",
+      "resource_uri": "/v1/modes/4/"
+    },
+    {
+      "id": 6,
+      "name": "night",
+      "resource_uri": "/v1/modes/6/"
+    },
+    {
+      "id": 3,
+      "name": "privacy",
+      "resource_uri": "/v1/modes/3/"
+    },
+    {
+      "id": 7,
+      "name": "standby",
+      "resource_uri": "/v1/modes/7/"
+    }
+  ]
+}

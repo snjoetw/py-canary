@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "limit": 500,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total_count": 429
+  },
+  "objects": [
+    {
+      "sensor_type": {
+        "id": 3,
+        "name": "air_quality",
+        "resource_uri": "/v1/sensors/3/"
+      },
+      "status": null,
+      "value": "0.8129177689552307"
+    },
+    {
+      "sensor_type": {
+        "id": 3,
+        "name": "air_quality",
+        "resource_uri": "/v1/sensors/3/"
+      },
+      "status": null,
+      "value": "0.8159225031416467"
+    },
+    {
+      "sensor_type": {
+        "id": 1,
+        "name": "humidity",
+        "resource_uri": "/v1/sensors/1/"
+      },
+      "status": null,
+      "value": "41.68813060192352"
+    },
+    {
+      "sensor_type": {
+        "id": 1,
+        "name": "humidity",
+        "resource_uri": "/v1/sensors/1/"
+      },
+      "status": null,
+      "value": "41.42166693667148"
+    },
+    {
+      "sensor_type": {
+        "id": 2,
+        "name": "temperature",
+        "resource_uri": "/v1/sensors/2/"
+      },
+      "status": null,
+      "value": "19.0007521446715"
+    },
+    {
+      "sensor_type": {
+        "id": 2,
+        "name": "temperature",
+        "resource_uri": "/v1/sensors/2/"
+      },
+      "status": null,
+      "value": "19.120397973567883"
+    }
+  ]
+}

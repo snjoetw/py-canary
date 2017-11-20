@@ -1,0 +1,6 @@
+{
+  "access_token": "aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj",
+  "token_type": "Bearer",
+  "expires_in": 31530999,
+  "scope": "read write read+write"
+}
