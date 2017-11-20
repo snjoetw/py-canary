@@ -63,7 +63,7 @@ class Api:
             ATTR_CLIENT_SECRET: ATTR_VALUE_CLIENT_SECRET,
             ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
             ATTR_SCOPE: ATTR_VALUE_SCOPE,
-        }, headers={
+        }, timeout=self._timeout, headers={
             HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT
         })
 
