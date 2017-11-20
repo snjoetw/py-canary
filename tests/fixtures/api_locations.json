@@ -49,7 +49,6 @@
             "name": "Canary"
           },
           "id": 80001,
-          "last_video_received": null,
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/2/",
           "name": "Dining Room",
@@ -67,8 +66,6 @@
             "name": "Canary"
           },
           "id": 80002,
-          "image_url": null,
-          "last_video_received": null,
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/1/",
           "name": "Front Door",
@@ -85,10 +82,7 @@
             "id": 1,
             "name": "Canary"
           },
-          "firmware_version": "v0.2.42",
           "id": 80003,
-          "image_url": "https://cnry-prod-videos.s3.amazonaws.com/ac9f712d36904b7fab3acc013688c731/1509616386-608x1080%3A100.png?Signature=zBHG%2BqGnQnaKVlYyKO28mHfTOPU%3D&Expires=1898495204&AWSAccessKeyId=ASIAJUTIIPBZ7AJOL6DA&x-amz-security-token=FQoDYXdzELj//////////wEaDGGRiq41vUyz0y/smCK3AxORupBqm2kYpjUQsIbHyfYxn5Tm0HFfx2CbzZObzTsbOiUo3STWIy1M4Kc3qWH4TtJvZPyNoe%2BJPa3RtasTs8h3jM4Lx5HGGGuVjGtTjFVKGI3JRmbfKbAziIMmWtwh9vor3awBlQLYeZrUYnbAwMx7R%2BuTQFR8qkipOQhsAu2MRzrrs2BuHy1ebDYDureKcB4SOXfYR8xSGYCudG0XLVnu%2BHFwi5qiYayoH4UadduwxwMQEZCX4w32Ry2e529Cggur723yomH1j3VEAg1jQ97PSuFFaTkxAUPT7V%2BvNeDH84A47Eubtux04sNa/VGLFtun%2BwZEdUXLjdTBy5Czk0TYl/oqfS6ZZv6wjS%2BtLD8B0z/F%2BIruvw%2BZtj3Wlr1e5RCjnUFcSEbYv0Z3ezaipS5EGanvyYn8UqkNyj8X0FHek0COOBR89EsppicUGxlVjC0oP6utZGo7mJi3UgAHmXfqALETQTon3%2BOMFGwXe8MsCi4y%2Bg7p/OAwPa/g1GDOr2qZ/zY8w474IkNlb9NzEkT4K1JswTkoSu4TAd7sVODBQLnss7oQGxChhlg9x84cNf8VKDM4asso9dPE0AU%3D",
-          "last_video_received": null,
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/2/",
           "name": "Bedroom",
@@ -106,8 +100,6 @@
             "name": "Canary"
           },
           "id": 80004,
-          "image_url": "https://cnry-prod-videos.s3.amazonaws.com/a4f7326693044d5694212ab019a6ddf6/1511074544-608x1080%3A100.png?Signature=GlU2V1be4C%2F1GoAXcnSKegE1Yo4%3D&Expires=1898495204&AWSAccessKeyId=ASIAJUTIIPBZ7AJOL6DA&x-amz-security-token=FQoDYXdzELj//////////wEaDGGRiq41vUyz0y/smCK3AxORupBqm2kYpjUQsIbHyfYxn5Tm0HFfx2CbzZObzTsbOiUo3STWIy1M4Kc3qWH4TtJvZPyNoe%2BJPa3RtasTs8h3jM4Lx5HGGGuVjGtTjFVKGI3JRmbfKbAziIMmWtwh9vor3awBlQLYeZrUYnbAwMx7R%2BuTQFR8qkipOQhsAu2MRzrrs2BuHy1ebDYDureKcB4SOXfYR8xSGYCudG0XLVnu%2BHFwi5qiYayoH4UadduwxwMQEZCX4w32Ry2e529Cggur723yomH1j3VEAg1jQ97PSuFFaTkxAUPT7V%2BvNeDH84A47Eubtux04sNa/VGLFtun%2BwZEdUXLjdTBy5Czk0TYl/oqfS6ZZv6wjS%2BtLD8B0z/F%2BIruvw%2BZtj3Wlr1e5RCjnUFcSEbYv0Z3ezaipS5EGanvyYn8UqkNyj8X0FHek0COOBR89EsppicUGxlVjC0oP6utZGo7mJi3UgAHmXfqALETQTon3%2BOMFGwXe8MsCi4y%2Bg7p/OAwPa/g1GDOr2qZ/zY8w474IkNlb9NzEkT4K1JswTkoSu4TAd7sVODBQLnss7oQGxChhlg9x84cNf8VKDM4asso9dPE0AU%3D",
-          "last_video_received": null,
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/2/",
           "name": "Front Door",
@@ -159,7 +151,6 @@
             "name": "Canary"
           },
           "id": 80005,
-          "last_video_received": null,
           "location": "/v1/locations/70002/",
           "mode": "/v1/modes/7/",
           "name": "Office",
