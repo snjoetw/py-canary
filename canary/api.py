@@ -41,9 +41,12 @@ class Api:
         self._password = password
         self._timeout = timeout
         self._token = None
+        self._modes_by_name = {}
+
+        self.login()
 
     def login(self):
-        r = requests.post(URL_LOGIN_API, {
+        response = requests.post(URL_LOGIN_API, {
             ATTR_USERNAME: self._username,
             ATTR_PASSWORD: self._password,
             ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
@@ -54,7 +57,12 @@ class Api:
             HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT
         })
 
-        self._token = r.json()["access_token"]
+        _LOGGER.debug("Received login response: %s, %s", response.status_code,
+                      response.content)
+
+        response.raise_for_status()
+
+        self._token = response.json()["access_token"]
         self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
 
     def get_modes(self):
@@ -104,15 +112,18 @@ class Api:
         return [Entry(data) for data in json]
 
     def _call_api(self, method, url, params=None, **kwargs):
-        _LOGGER.debug("About to call {} with {}".format(url, params))
+        _LOGGER.debug("About to call %s with %s", url, params)
 
-        r = requests.request(method, url, params=params, timeout=self._timeout,
-                             headers=self._api_headers(), **kwargs)
-        r.raise_for_status()
+        response = requests.request(method, url, params=params,
+                                    timeout=self._timeout,
+                                    headers=self._api_headers(), **kwargs)
 
-        _LOGGER.debug("Received API response: {}".format(r.content))
+        _LOGGER.debug("Received API response: %s, %s", response.status_code,
+                      response.content)
 
-        return r
+        response.raise_for_status()
+
+        return response
 
     def _api_headers(self):
         return {
@@ -150,15 +161,14 @@ class Location:
     def __init__(self, data, modes_by_name):
         self._id = data["id"]
         self._name = data["name"]
-        self._resource_uri = data["resource_uri"]
         self._is_private = data["is_private"]
         self._devices = []
         self._customers = []
 
-        mode_name = data.get("mode", {}).get("name", None);
+        mode_name = data.get("mode", {}).get("name", None)
         self._mode = modes_by_name.get(mode_name, None)
 
-        current_mode_name = data.get("current_mode", {}).get("name", None);
+        current_mode_name = data.get("current_mode", {}).get("name", None)
         self._current_mode = modes_by_name.get(current_mode_name, None)
 
         for device_data in data["devices"]:
@@ -184,10 +194,6 @@ class Location:
         return self._current_mode
 
     @property
-    def resource_uri(self):
-        return self._resource_uri
-
-    @property
     def devices(self):
         return self._devices
 
@@ -210,7 +216,6 @@ class Location:
 class Device:
     def __init__(self, data):
         self._id = data["id"]
-        self._uuid = data["uuid"]
         self._name = data["name"]
         self._device_mode = None
         self._is_online = data["online"]
@@ -219,10 +224,6 @@ class Device:
     @property
     def device_id(self):
         return self._id
-
-    @property
-    def uuid(self):
-        return self._uuid
 
     @property
     def name(self):
@@ -265,7 +266,6 @@ class Entry:
     def __init__(self, data):
         self._entry_id = data["id"]
         self._description = data["description"]
-        self._device_uuids = data["device_uuids"]
         self._entry_type = data["entry_type"]
         self._start_time = data["start_time"]
         self._end_time = data["end_time"]
@@ -281,10 +281,6 @@ class Entry:
     @property
     def description(self):
         return self._description
-
-    @property
-    def device_uuids(self):
-        return self._device_uuids
 
     @property
     def entry_type(self):
