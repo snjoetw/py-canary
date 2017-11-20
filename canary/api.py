@@ -12,6 +12,7 @@ HEADER_VALUE_USER_AGENT = "Canary/2.10.0 (iPhone; iOS 11.2; Scale/3.00)"
 
 URL_LOGIN_API = "https://api.canaryis.com/o/access_token/"
 URL_LOCATIONS_API = "https://api.canaryis.com/v1/locations/"
+URL_LOCATION_API = "https://api.canaryis.com/v1/locations/{}/"
 URL_MODES_API = "https://api.canaryis.com/v1/modes/"
 URL_ENTRIES_API = "https://api.canaryis.com/v1/entries/"
 URL_READINGS_API = "https://api.canaryis.com/v1/readings/"
@@ -32,7 +33,16 @@ DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 _LOGGER = logging.getLogger(__name__)
 
-RECORDING_MODE_NAMES = ["armed", "disarmed"]
+LOCATION_MODE_HOME = "home"
+LOCATION_MODE_AWAY = "away"
+LOCATION_MODE_NIGHT = "night"
+
+LOCATION_STATE_ARMED = "armed"
+LOCATION_STATE_DISARMED = "disarmed"
+LOCATION_STATE_PRIVACY = "privacy"
+LOCATION_STATE_STANDBY = "standby"
+
+RECORDING_STATES = [LOCATION_STATE_ARMED, LOCATION_STATE_DISARMED]
 
 
 class Api:
@@ -72,6 +82,19 @@ class Api:
     def get_locations(self):
         json = self._call_api("get", URL_LOCATIONS_API).json()["objects"]
         return [Location(data, self._modes_by_name) for data in json]
+
+    def get_location(self, location_id):
+        url = URL_LOCATION_API.format(location_id)
+        json = self._call_api("get", url).json()
+        return Location(json, self._modes_by_name)
+
+    def set_location_mode(self, location_id, mode_name):
+        url = URL_LOCATION_API.format(location_id)
+        self._call_api("patch", url, json={
+            "mode": self._modes_by_name[mode_name].resource_uri,
+            "is_private": False
+        })
+        return None
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
@@ -210,7 +233,7 @@ class Location:
         if self.current_mode is None:
             return False
 
-        return self.current_mode.name in RECORDING_MODE_NAMES
+        return self.current_mode.name in RECORDING_STATES
 
 
 class Device:
