@@ -88,11 +88,11 @@ class Api:
         json = self._call_api("get", url).json()
         return Location(json, self._modes_by_name)
 
-    def set_location_mode(self, location_id, mode_name):
+    def set_location_mode(self, location_id, mode_name, is_private=False):
         url = URL_LOCATION_API.format(location_id)
         self._call_api("patch", url, json={
             "mode": self._modes_by_name[mode_name].resource_uri,
-            "is_private": False
+            "is_private": is_private
         })
         return None
 
