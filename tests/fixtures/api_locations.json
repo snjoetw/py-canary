@@ -85,6 +85,7 @@
             "name": "Canary"
           },
           "id": 80003,
+          "uuid": "uuid-80003",
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/2/",
           "name": "Bedroom",
@@ -102,6 +103,7 @@
             "name": "Canary"
           },
           "id": 80004,
+          "uuid": "uuid-80004",
           "location": "/v1/locations/70001/",
           "mode": "/v1/modes/2/",
           "name": "Front Door",
@@ -153,6 +155,7 @@
             "name": "Canary"
           },
           "id": 80005,
+          "uuid": "uuid-80005",
           "location": "/v1/locations/70002/",
           "mode": "/v1/modes/7/",
           "name": "Office",
