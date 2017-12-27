@@ -247,6 +247,7 @@ class Location:
 class Device:
     def __init__(self, data):
         self._id = data["id"]
+        self._uuid = data["uuid"]
         self._name = data["name"]
         self._device_mode = None
         self._is_online = data["online"]
@@ -255,6 +256,10 @@ class Device:
     @property
     def device_id(self):
         return self._id
+
+    @property
+    def uuid(self):
+        return self._uuid
 
     @property
     def name(self):
