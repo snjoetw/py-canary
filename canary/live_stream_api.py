@@ -35,12 +35,12 @@ class LiveStreamApi:
         self.login()
 
     def login(self):
-        r = requests.get(URL_LOGIN_PAGE)
+        response = requests.get(URL_LOGIN_PAGE)
 
-        xsrf_token = r.cookies[COOKIE_XSRF_TOKEN]
-        ssesyranac = r.cookies[COOKIE_SSESYRANAC]
+        xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
+        ssesyranac = response.cookies[COOKIE_SSESYRANAC]
 
-        r = requests.post(URL_LOGIN_API, {
+        response = requests.post(URL_LOGIN_API, {
             ATTR_USERNAME: self._username,
             ATTR_PASSWORD: self._password
         }, headers={
@@ -51,19 +51,20 @@ class LiveStreamApi:
         })
 
         self._ssesyranac = ssesyranac
-        self._token = r.json()[ATTR_ACCESS_TOKEN]
+        self._token = response.json()[ATTR_ACCESS_TOKEN]
         self._xsrf_token = xsrf_token
 
     def start_session(self, device_uuid):
-        r = requests.post(URL_GET_SESSION.format(device_uuid=device_uuid),
-                          headers=self._api_headers(),
-                          cookies=self._api_cookies(),
-                          json={
-                              "deviceUUID": device_uuid
-                          })
-        r.raise_for_status()
+        response = requests.post(
+            URL_GET_SESSION.format(device_uuid=device_uuid),
+            headers=self._api_headers(),
+            cookies=self._api_cookies(),
+            json={
+                "deviceUUID": device_uuid
+            })
+        response.raise_for_status()
 
-        session_id = r.json().get(ATTR_SESSION_ID)
+        session_id = response.json().get(ATTR_SESSION_ID)
 
         if self.renew_session(device_uuid, session_id):
             return session_id
@@ -71,15 +72,16 @@ class LiveStreamApi:
         return None
 
     def renew_session(self, device_uuid, session_id):
-        r = requests.post(URL_START_SESSION.format(device_uuid=device_uuid),
-                          headers=self._api_headers(),
-                          cookies=self._api_cookies(),
-                          json={
-                              ATTR_SESSION_ID: session_id
-                          })
-        r.raise_for_status()
+        response = requests.post(
+            URL_START_SESSION.format(device_uuid=device_uuid),
+            headers=self._api_headers(),
+            cookies=self._api_cookies(),
+            json={
+                ATTR_SESSION_ID: session_id
+            })
+        response.raise_for_status()
 
-        json = r.json()
+        json = response.json()
 
         return "message" in json and json["message"] == "success"
 
