@@ -2,3 +2,4 @@
 setup.py
 canary/__init__.py
 canary/api.py
+canary/live_stream_api.py
