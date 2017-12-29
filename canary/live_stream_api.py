@@ -87,7 +87,7 @@ class LiveStreamApi:
 
     def get_live_stream_url(self, device_id, session_id):
         return URL_LIVE_STREAM.format(device_id=device_id,
-                                      session_id=session_id);
+                                      session_id=session_id)
 
     def _api_cookies(self):
         return {

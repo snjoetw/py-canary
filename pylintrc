@@ -33,6 +33,7 @@ disable=
   too-many-lines,
   too-few-public-methods,
   abstract-method,
+  no-self-use,
   missing-docstring
 
 [EXCEPTIONS]
