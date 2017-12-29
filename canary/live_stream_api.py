@@ -13,9 +13,10 @@ HEADER_VALUE_AUTHORIZATION = "Bearer {}"
 
 URL_LOGIN_PAGE = "https://my.canary.is/login"
 URL_LOGIN_API = "https://my.canary.is/api/auth/login"
-URL_GET_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/session"
-URL_START_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/send"
-URL_LIVE_STREAM = "https://my.canary.is/api/watchlive/{device_id}/{session_id}/stream.m3u8"
+URL_START_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/session"
+URL_RENEW_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/send"
+URL_LIVE_STREAM = "https://my.canary.is/api/watchlive/{device_id}/" \
+                  "{session_id}/stream.m3u8"
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
@@ -56,7 +57,7 @@ class LiveStreamApi:
 
     def start_session(self, device_uuid):
         response = requests.post(
-            URL_GET_SESSION.format(device_uuid=device_uuid),
+            URL_START_SESSION.format(device_uuid=device_uuid),
             headers=self._api_headers(),
             cookies=self._api_cookies(),
             json={
@@ -73,7 +74,7 @@ class LiveStreamApi:
 
     def renew_session(self, device_uuid, session_id):
         response = requests.post(
-            URL_START_SESSION.format(device_uuid=device_uuid),
+            URL_RENEW_SESSION.format(device_uuid=device_uuid),
             headers=self._api_headers(),
             cookies=self._api_cookies(),
             json={
