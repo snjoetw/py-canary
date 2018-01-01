@@ -4,7 +4,7 @@ from enum import Enum
 
 import requests
 
-from canary.live_stream_api import LiveStreamApi
+from canary.live_stream_api import LiveStreamApi, LiveStreamSession
 
 HEADER_AUTHORIZATION = "Authorization"
 HEADER_USER_AGENT = "User-Agent"
@@ -137,19 +137,12 @@ class Api:
         }).json()["objects"]
         return [Entry(data) for data in json]
 
-    def start_live_stream_session(self, device_uuid):
+    def get_live_stream_session(self, device):
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(self._username,
                                                   self._password,
                                                   self._timeout)
-
-        return self._live_stream_api.start_session(device_uuid)
-
-    def renew_live_stream_session(self, device_uuid, session_id):
-        return self._live_stream_api.renew_session(device_uuid, session_id)
-
-    def get_live_stream_url(self, device_id, session_id):
-        return self._live_stream_api.get_live_stream_url(device_id, session_id)
+        return LiveStreamSession(self._live_stream_api, device)
 
     def _call_api(self, method, url, params=None, **kwargs):
         _LOGGER.debug("About to call %s with %s", url, params)

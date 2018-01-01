@@ -1,4 +1,5 @@
 import requests
+from requests import HTTPError
 
 COOKIE_XSRF_TOKEN = "XSRF-TOKEN"
 COOKIE_SSESYRANAC = "ssesyranac"
@@ -102,3 +103,27 @@ class LiveStreamApi:
             HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(
                 self._token)
         }
+
+
+class LiveStreamSession:
+    def __init__(self, api, device):
+        self._api = api
+        self._device_uuid = device.uuid
+        self._device_id = device.device_id
+        self._session_id = None
+
+    @property
+    def live_stream_url(self):
+        if self._session_id is None:
+            self._session_id = self._api.start_session(self._device_uuid)
+        else:
+            try:
+                self._api.renew_session(self._device_uuid, self._session_id)
+            except HTTPError as e:
+                if e.response.status_code == 403:
+                    self._session_id = self._api.start_session(
+                        self._device_uuid)
+                else:
+                    raise e
+
+        return self._api.get_live_stream_url(self._device_id, self._session_id)
