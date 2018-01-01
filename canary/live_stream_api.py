@@ -119,11 +119,11 @@ class LiveStreamSession:
         else:
             try:
                 self._api.renew_session(self._device_uuid, self._session_id)
-            except HTTPError as e:
-                if e.response.status_code == 403:
+            except HTTPError as ex:
+                if ex.response.status_code == 403:
                     self._session_id = self._api.start_session(
                         self._device_uuid)
                 else:
-                    raise e
+                    raise ex
 
         return self._api.get_live_stream_url(self._device_id, self._session_id)
