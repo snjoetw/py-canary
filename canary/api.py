@@ -317,7 +317,7 @@ class Entry:
         self._end_time = data.get('end_time', '')
         self._thumbnails = []
 
-        for thumbnail_data in data.get('thumbnails', ''):
+        for thumbnail_data in data.get('thumbnails', []):
             self._thumbnails.append(Thumbnail(thumbnail_data))
 
     @property
