@@ -311,13 +311,13 @@ class SensorType(Enum):
 class Entry:
     def __init__(self, data):
         self._entry_id = data["id"]
-        self._description = data["description"]
-        self._entry_type = data["entry_type"]
-        self._start_time = data["start_time"]
-        self._end_time = data["end_time"]
+        self._description = data.get('description', '')
+        self._entry_type = data.get('entry_type', '')
+        self._start_time = data.get('start_time', '')
+        self._end_time = data.get('end_time', '')
         self._thumbnails = []
 
-        for thumbnail_data in data["thumbnails"]:
+        for thumbnail_data in data.get('thumbnails', []):
             self._thumbnails.append(Thumbnail(thumbnail_data))
 
     @property
