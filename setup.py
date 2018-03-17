@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='py-canary',
-    version='0.4.1',
+    version='0.5.0',
     packages=['canary'],
     url='https://github.com/snjoetw/py-canary',
     license='MIT',
