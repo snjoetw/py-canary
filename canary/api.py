@@ -309,6 +309,7 @@ class SensorType(Enum):
     BATTERY = "battery"
     WIFI = "wifi"
 
+
 class Entry:
     def __init__(self, data):
         self._entry_id = data["id"]
