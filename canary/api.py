@@ -306,6 +306,8 @@ class SensorType(Enum):
     AIR_QUALITY = "air_quality"
     HUMIDITY = "humidity"
     TEMPERATURE = "temperature"
+    BATTERY = "battery"
+    WIFI = "wifi"
 
 
 class Entry:
