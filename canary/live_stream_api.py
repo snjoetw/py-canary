@@ -23,7 +23,7 @@ URL_LIVE_STREAM = "https://my.canary.is/api/watchlive/{device_id}/" \
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
-ATTR_ACCESS_TOKEN = "token"
+ATTR_TOKEN = "token"
 ATTR_SESSION_ID = "sessionId"
 
 class LiveStreamApi:
@@ -58,7 +58,7 @@ class LiveStreamApi:
         })
 
         self._ssesyranac = ssesyranac
-        self._token = response.json()[ATTR_ACCESS_TOKEN]
+        self._token = response.json()[ATTR_TOKEN]
         self._xsrf_token = xsrf_token
         self._csrf_token = csrf_token
 
