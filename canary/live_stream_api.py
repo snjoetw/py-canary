@@ -3,11 +3,13 @@ from requests import HTTPError
 
 COOKIE_XSRF_TOKEN = "XSRF-TOKEN"
 COOKIE_SSESYRANAC = "ssesyranac"
+COOKIE_CNRYCSRF = "cnrycsrf"
 
 COOKIE_VALUE_SSESYRANAC = "token={}"
 
 HEADER_XSRF_TOKEN = "X-XSRF-TOKEN"
 HEADER_SSESYRANAC = "ssesyranac"
+HEADER_CSRF_TOKEN = "CSRF-Token"
 HEADER_AUTHORIZATION = "Authorization"
 
 HEADER_VALUE_AUTHORIZATION = "Bearer {}"
@@ -21,9 +23,8 @@ URL_LIVE_STREAM = "https://my.canary.is/api/watchlive/{device_id}/" \
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
-ATTR_ACCESS_TOKEN = "access_token"
+ATTR_ACCESS_TOKEN = "token"
 ATTR_SESSION_ID = "sessionId"
-
 
 class LiveStreamApi:
     def __init__(self, username, password, timeout=10):
@@ -33,6 +34,7 @@ class LiveStreamApi:
         self._token = None
         self._ssesyranac = None
         self._xsrf_token = None
+        self._csrf_token = None
 
         self.login()
 
@@ -41,20 +43,24 @@ class LiveStreamApi:
 
         xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
         ssesyranac = response.cookies[COOKIE_SSESYRANAC]
+        csrf_token = response.cookies[COOKIE_CNRYCSRF]
 
-        response = requests.post(URL_LOGIN_API, {
+        response = requests.post(URL_LOGIN_API, json={
             ATTR_USERNAME: self._username,
             ATTR_PASSWORD: self._password
         }, headers={
-            HEADER_XSRF_TOKEN: xsrf_token
+            HEADER_XSRF_TOKEN: xsrf_token,
+            HEADER_CSRF_TOKEN: csrf_token
         }, cookies={
             COOKIE_XSRF_TOKEN: xsrf_token,
-            COOKIE_SSESYRANAC: ssesyranac
+            COOKIE_SSESYRANAC: ssesyranac,
+            COOKIE_CNRYCSRF: csrf_token
         })
 
         self._ssesyranac = ssesyranac
         self._token = response.json()[ATTR_ACCESS_TOKEN]
         self._xsrf_token = xsrf_token
+        self._csrf_token = csrf_token
 
     def start_session(self, device_uuid):
         response = requests.post(
@@ -94,12 +100,14 @@ class LiveStreamApi:
     def _api_cookies(self):
         return {
             COOKIE_XSRF_TOKEN: self._xsrf_token,
-            COOKIE_SSESYRANAC: self._ssesyranac
+            COOKIE_SSESYRANAC: self._ssesyranac,
+            COOKIE_CNRYCSRF: self._csrf_token
         }
 
     def _api_headers(self):
         return {
             HEADER_XSRF_TOKEN: self._xsrf_token,
+            HEADER_CSRF_TOKEN: self._csrf_token,
             HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(
                 self._token)
         }
