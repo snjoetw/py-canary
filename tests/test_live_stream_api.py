@@ -9,11 +9,13 @@ from canary.live_stream_api import (
     URL_LOGIN_API,
     URL_LOGIN_PAGE,
     COOKIE_XSRF_TOKEN,
-    COOKIE_SSESYRANAC
+    COOKIE_SSESYRANAC,
+    COOKIE_CNRYCSRF
 )
 
 COOKIE_XSRF_VAL = "xsrf"
 COOKIE_COOKIE_SSESYRANAC_VAL = "ssesyranac"
+COOKIE_CNRYCSRF_VAL = "cnrycsrf_value"
 
 
 def load_fixture(filename):
@@ -33,7 +35,8 @@ def _setup_responses(mock):
         URL_LOGIN_PAGE,
         cookies={
             COOKIE_XSRF_TOKEN: COOKIE_XSRF_VAL,
-            COOKIE_SSESYRANAC: COOKIE_COOKIE_SSESYRANAC_VAL
+            COOKIE_SSESYRANAC: COOKIE_COOKIE_SSESYRANAC_VAL,
+            COOKIE_CNRYCSRF: COOKIE_CNRYCSRF_VAL,
         }
     )
 
