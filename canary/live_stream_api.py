@@ -26,6 +26,7 @@ ATTR_PASSWORD = "password"
 ATTR_TOKEN = "token"
 ATTR_SESSION_ID = "sessionId"
 
+
 class LiveStreamApi:
     def __init__(self, username, password, timeout=10):
         self._username = username
