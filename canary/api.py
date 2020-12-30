@@ -97,7 +97,6 @@ class Api:
             "mode": self._modes_by_name[mode_name].resource_uri,
             "is_private": is_private
         })
-        return None
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
