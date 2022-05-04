@@ -100,7 +100,7 @@ class Api:
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
-        start = end - timedelta(hours=2)
+        start = end - timedelta(hours=1)
         created_range = "{},{}".format(start.strftime(DATETIME_FORMAT),
                                        end.strftime(DATETIME_FORMAT))
         json = self._call_api("get", URL_READINGS_API, {
