@@ -12,7 +12,7 @@ HEADER_AUTHORIZATION = "Authorization"
 
 HEADER_VALUE_AUTHORIZATION = "Bearer {}"
 
-URL_LOGIN_PAGE = "https://my.canary.is/v2/login"
+URL_LOGIN_PAGE = "https://my.canary.is/manifest.json"
 URL_LOGIN_API = "https://api-prod.canaryis.com/o/access_token/"
 URL_START_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/session"
 URL_RENEW_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/send"
