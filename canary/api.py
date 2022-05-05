@@ -108,7 +108,7 @@ class Api:
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
-        start = end - timedelta(hours=1)
+        start = end - timedelta(minutes=40)
         created_range = (
             f"{start.strftime(DATETIME_FORMAT)},{end.strftime(DATETIME_FORMAT)}"
         )
