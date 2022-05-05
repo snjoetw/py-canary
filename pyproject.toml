@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 88
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+testpaths = [
+    "tests",
+    ]
+markers = [
+    "slow: mark test as slow (deselect with '-m \"not slow\"')",
+    "current_test: marks the current coding test to run",
+    "unfinished: test is currently being coded (deselect with '-m \"not unfinished\"')"
+    ]
