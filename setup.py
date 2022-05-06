@@ -1,13 +1,14 @@
-from distutils.core import setup
+import setuptools
 
-setup(
-    name='py-canary',
-    version='0.5.1',
-    packages=['canary'],
-    url='https://github.com/snjoetw/py-canary',
-    license='MIT',
-    author='snjoetw',
-    author_email='snjoetw@gmail.com',
-    description='Python API for Canary Security Camera',
-    requires=['requests']
+setuptools.setup(
+    name="py-canary",
+    version="0.5.2",
+    author="snjoetw",
+    author_email="snjoetw@gmail.com",
+    packages=["canary"],
+    description="Python API for Canary Security Camera",
+    url="https://github.com/snjoetw/py-canary",
+    license="MIT",
+    python_requires=">=3.6",
+    install_requires=["requests"],
 )
