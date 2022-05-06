@@ -1,5 +1,5 @@
 {
-  "token": "ffffffffffffffffffffffffffffffffffffffff",
+  "access_token": "ffffffffffffffffffffffffffffffffffffffff",
   "user": {
     "email": "someuser@someemailserver.com"
   }

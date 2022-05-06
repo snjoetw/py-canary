@@ -9,12 +9,12 @@ from canary.live_stream_api import LiveStreamApi, LiveStreamSession
 HEADER_AUTHORIZATION = "Authorization"
 HEADER_USER_AGENT = "User-Agent"
 
-HEADER_VALUE_AUTHORIZATION = "Bearer {}"
-HEADER_VALUE_USER_AGENT = "Canary/2.10.0 (iPhone; iOS 11.2; Scale/3.00)"
+HEADER_VALUE_AUTHORIZATION = "Bearer"
+HEADER_VALUE_USER_AGENT = "Canary/5.9.0 (iPhone; iOS 15.4.1; Scale/3.00)"
 
 URL_LOGIN_API = "https://api.canaryis.com/o/access_token/"
 URL_LOCATIONS_API = "https://api.canaryis.com/v1/locations/"
-URL_LOCATION_API = "https://api.canaryis.com/v1/locations/{}/"
+URL_LOCATION_API = "https://api.canaryis.com/v1/locations/"
 URL_MODES_API = "https://api.canaryis.com/v1/modes/"
 URL_ENTRIES_API = "https://api.canaryis.com/v1/entries/"
 URL_READINGS_API = "https://api.canaryis.com/v1/readings/"
@@ -59,19 +59,23 @@ class Api:
         self.login()
 
     def login(self):
-        response = requests.post(URL_LOGIN_API, {
-            ATTR_USERNAME: self._username,
-            ATTR_PASSWORD: self._password,
-            ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-            ATTR_CLIENT_SECRET: ATTR_VALUE_CLIENT_SECRET,
-            ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
-            ATTR_SCOPE: ATTR_VALUE_SCOPE,
-        }, timeout=self._timeout, headers={
-            HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT
-        })
+        response = requests.post(
+            URL_LOGIN_API,
+            {
+                ATTR_USERNAME: self._username,
+                ATTR_PASSWORD: self._password,
+                ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
+                ATTR_CLIENT_SECRET: ATTR_VALUE_CLIENT_SECRET,
+                ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
+                ATTR_SCOPE: ATTR_VALUE_SCOPE,
+            },
+            timeout=self._timeout,
+            headers={HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT},
+        )
 
-        _LOGGER.debug("Received login response: %s, %s", response.status_code,
-                      response.content)
+        _LOGGER.debug(
+            f"Received login response: {response.status_code}, {response.content}"
+        )
 
         response.raise_for_status()
 
@@ -87,28 +91,37 @@ class Api:
         return [Location(data, self._modes_by_name) for data in json]
 
     def get_location(self, location_id):
-        url = URL_LOCATION_API.format(location_id)
+        url = f"{URL_LOCATION_API}{location_id}/"
         json = self._call_api("get", url).json()
         return Location(json, self._modes_by_name)
 
     def set_location_mode(self, location_id, mode_name, is_private=False):
-        url = URL_LOCATION_API.format(location_id)
-        self._call_api("patch", url, json={
-            "mode": self._modes_by_name[mode_name].resource_uri,
-            "is_private": is_private
-        })
+        url = f"{URL_LOCATION_API}{location_id}/"
+        self._call_api(
+            "patch",
+            url,
+            json={
+                "mode": self._modes_by_name[mode_name].resource_uri,
+                "is_private": is_private,
+            },
+        )
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
-        start = end - timedelta(hours=2)
-        created_range = "{},{}".format(start.strftime(DATETIME_FORMAT),
-                                       end.strftime(DATETIME_FORMAT))
-        json = self._call_api("get", URL_READINGS_API, {
-            "created__range": created_range,
-            "device": device_id,
-            "resolution": "10m",
-            "limit": 0
-        }).json()["objects"]
+        start = end - timedelta(minutes=40)
+        created_range = (
+            f"{start.strftime(DATETIME_FORMAT)},{end.strftime(DATETIME_FORMAT)}"
+        )
+        json = self._call_api(
+            "get",
+            URL_READINGS_API,
+            {
+                "created__range": created_range,
+                "device": device_id,
+                "resolution": "10m",
+                "limit": 0,
+            },
+        ).json()["objects"]
         return [Reading(data) for data in json]
 
     def get_latest_readings(self, device_id):
@@ -121,37 +134,48 @@ class Api:
 
         return readings_by_type.values()
 
-    def get_entries(self, location_id, entry_type="motion", limit=1,
-                    last_modified=None):
+    def get_entries(
+        self, location_id, entry_type="motion", limit=1, last_modified=None
+    ):
         if last_modified is None:
             last_modified = datetime.utcnow() - timedelta(days=3)
 
-        json = self._call_api("get", URL_ENTRIES_API, {
-            "last_modified__gt": last_modified.strftime(DATETIME_FORMAT),
-            "include_deleted": "True",
-            "offset": "0",
-            "location": location_id,
-            "limit": limit,
-            "entry_type": entry_type,
-        }).json()["objects"]
+        json = self._call_api(
+            "get",
+            URL_ENTRIES_API,
+            {
+                "last_modified__gt": last_modified.strftime(DATETIME_FORMAT),
+                "include_deleted": "True",
+                "offset": "0",
+                "location": location_id,
+                "limit": limit,
+                "entry_type": entry_type,
+            },
+        ).json()["objects"]
         return [Entry(data) for data in json]
 
     def get_live_stream_session(self, device):
         if self._live_stream_api is None:
-            self._live_stream_api = LiveStreamApi(self._username,
-                                                  self._password,
-                                                  self._timeout)
+            self._live_stream_api = LiveStreamApi(
+                self._username, self._password, self._timeout
+            )
         return LiveStreamSession(self._live_stream_api, device)
 
     def _call_api(self, method, url, params=None, **kwargs):
-        _LOGGER.debug("About to call %s with %s", url, params)
+        _LOGGER.debug(f"About to call {url} with {params}")
 
-        response = requests.request(method, url, params=params,
-                                    timeout=self._timeout,
-                                    headers=self._api_headers(), **kwargs)
+        response = requests.request(
+            method,
+            url,
+            params=params,
+            timeout=self._timeout,
+            headers=self._api_headers(),
+            **kwargs,
+        )
 
-        _LOGGER.debug("Received API response: %s, %s", response.status_code,
-                      response.content)
+        _LOGGER.debug(
+            f"Received API response: {response.status_code}, {response.content}"
+        )
 
         response.raise_for_status()
 
@@ -160,8 +184,7 @@ class Api:
     def _api_headers(self):
         return {
             HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(
-                self._token)
+            HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {self._token}",
         }
 
 
@@ -312,13 +335,13 @@ class SensorType(Enum):
 class Entry:
     def __init__(self, data):
         self._entry_id = data["id"]
-        self._description = data.get('description', '')
-        self._entry_type = data.get('entry_type', '')
-        self._start_time = data.get('start_time', '')
-        self._end_time = data.get('end_time', '')
+        self._description = data.get("description", "")
+        self._entry_type = data.get("entry_type", "")
+        self._start_time = data.get("start_time", "")
+        self._end_time = data.get("end_time", "")
         self._thumbnails = []
 
-        for thumbnail_data in data.get('thumbnails', []):
+        for thumbnail_data in data.get("thumbnails", []):
             self._thumbnails.append(Thumbnail(thumbnail_data))
 
     @property
@@ -362,7 +385,7 @@ class Mode:
         self._resource_uri = data["resource_uri"]
 
     def __repr__(self):
-        return "Mode(id={}, name={})".format(self.mode_id, self.name)
+        return f"Mode(id={self.mode_id}, name={self.name})"
 
     @property
     def mode_id(self):

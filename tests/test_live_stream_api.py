@@ -10,7 +10,6 @@ from canary.live_stream_api import (
     URL_LOGIN_PAGE,
     COOKIE_XSRF_TOKEN,
     COOKIE_SSESYRANAC,
-    COOKIE_CNRYCSRF
 )
 
 COOKIE_XSRF_VAL = "xsrf"
@@ -36,7 +35,6 @@ def _setup_responses(mock):
         cookies={
             COOKIE_XSRF_TOKEN: COOKIE_XSRF_VAL,
             COOKIE_SSESYRANAC: COOKIE_COOKIE_SSESYRANAC_VAL,
-            COOKIE_CNRYCSRF: COOKIE_CNRYCSRF_VAL,
         }
     )
 

@@ -4,20 +4,14 @@ from requests import HTTPError
 COOKIE_XSRF_TOKEN = "XSRF-TOKEN"
 COOKIE_SSESYRANAC = "ssesyranac"
 
-COOKIE_VALUE_SSESYRANAC = "token={}"
-
 HEADER_XSRF_TOKEN = "X-XSRF-TOKEN"
-HEADER_SSESYRANAC = "ssesyranac"
 HEADER_AUTHORIZATION = "Authorization"
 
-HEADER_VALUE_AUTHORIZATION = "Bearer {}"
+HEADER_VALUE_AUTHORIZATION = "Bearer"
 
-URL_LOGIN_PAGE = "https://my.canary.is/v2/login"
+URL_LOGIN_PAGE = "https://my.canary.is/manifest.json"
 URL_LOGIN_API = "https://api-prod.canaryis.com/o/access_token/"
-URL_START_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/session"
-URL_RENEW_SESSION = "https://my.canary.is/api/watchlive/{device_uuid}/send"
-URL_LIVE_STREAM = "https://my.canary.is/api/watchlive/{device_id}/" \
-                  "{session_id}/stream.m3u8"
+URL_WATCHLIVE_BASE = "https://my.canary.is/api/watchlive/"
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
@@ -30,6 +24,7 @@ ATTR_SCOPE = "scope"
 ATTR_VALUE_CLIENT_ID = "53e67d00de5638b3d8f7"
 ATTR_VALUE_GRANT_TYPE = "password"
 ATTR_VALUE_SCOPE = "write"
+
 
 class LiveStreamApi:
     def __init__(self, username, password, timeout=10):
@@ -48,18 +43,21 @@ class LiveStreamApi:
         xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
         ssesyranac = response.cookies[COOKIE_SSESYRANAC]
 
-        response = requests.post(URL_LOGIN_API, {
-            ATTR_USERNAME: self._username,
-            ATTR_PASSWORD: self._password,
-            ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-            ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
-            ATTR_SCOPE: ATTR_VALUE_SCOPE
-        }, headers={
-            HEADER_XSRF_TOKEN: xsrf_token
-        }, cookies={
-            COOKIE_XSRF_TOKEN: xsrf_token,
-            COOKIE_SSESYRANAC: ssesyranac
-        })
+        response = requests.post(
+            URL_LOGIN_API,
+            {
+                ATTR_USERNAME: self._username,
+                ATTR_PASSWORD: self._password,
+                ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
+                ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
+                ATTR_SCOPE: ATTR_VALUE_SCOPE,
+            },
+            headers={HEADER_XSRF_TOKEN: xsrf_token},
+            cookies={
+                COOKIE_XSRF_TOKEN: xsrf_token,
+                COOKIE_SSESYRANAC: ssesyranac,
+            },
+        )
 
         self._ssesyranac = ssesyranac
         self._token = response.json()[ATTR_TOKEN]
@@ -67,12 +65,11 @@ class LiveStreamApi:
 
     def start_session(self, device_uuid):
         response = requests.post(
-            URL_START_SESSION.format(device_uuid=device_uuid),
+            f"{URL_WATCHLIVE_BASE}{device_uuid}/session",
             headers=self._api_headers(),
             cookies=self._api_cookies(),
-            json={
-                "deviceUUID": device_uuid
-            })
+            json={"deviceUUID": device_uuid},
+        )
         response.raise_for_status()
 
         session_id = response.json().get(ATTR_SESSION_ID)
@@ -84,12 +81,11 @@ class LiveStreamApi:
 
     def renew_session(self, device_uuid, session_id):
         response = requests.post(
-            URL_RENEW_SESSION.format(device_uuid=device_uuid),
+            f"{URL_WATCHLIVE_BASE}{device_uuid}/send",
             headers=self._api_headers(),
             cookies=self._api_cookies(),
-            json={
-                ATTR_SESSION_ID: session_id
-            })
+            json={ATTR_SESSION_ID: session_id},
+        )
         response.raise_for_status()
 
         json = response.json()
@@ -97,20 +93,18 @@ class LiveStreamApi:
         return "message" in json and json["message"] == "success"
 
     def get_live_stream_url(self, device_id, session_id):
-        return URL_LIVE_STREAM.format(device_id=device_id,
-                                      session_id=session_id)
+        return f"{URL_WATCHLIVE_BASE}{device_id}/{session_id}/stream.m3u8"
 
     def _api_cookies(self):
         return {
             COOKIE_XSRF_TOKEN: self._xsrf_token,
-            COOKIE_SSESYRANAC: self._ssesyranac
+            COOKIE_SSESYRANAC: self._ssesyranac,
         }
 
     def _api_headers(self):
         return {
             HEADER_XSRF_TOKEN: self._xsrf_token,
-            HEADER_AUTHORIZATION: HEADER_VALUE_AUTHORIZATION.format(
-                self._token)
+            HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {self._token}",
         }
 
 
@@ -130,8 +124,7 @@ class LiveStreamSession:
                 self._api.renew_session(self._device_uuid, self._session_id)
             except HTTPError as ex:
                 if ex.response.status_code == 403:
-                    self._session_id = self._api.start_session(
-                        self._device_uuid)
+                    self._session_id = self._api.start_session(self._device_uuid)
                 else:
                     raise ex
 
