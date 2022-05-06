@@ -24,3 +24,15 @@ repos:
     rev: 4.0.1
     hooks:
     -   id: flake8
+-   repo: local
+    hooks:
+      # Run mypy through our wrapper script in order to get the possible
+      # pyenv and/or virtualenv activated; it may not have been e.g. if
+      # committing from a GUI tool that was not launched from an activated
+      # shell.
+    -   id: pylint
+        name: pylint
+        entry: script/run-in-env.sh pylint -j 0
+        language: script
+        types: [python]
+        files: ^canary/.+\.py$
