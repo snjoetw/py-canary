@@ -179,6 +179,7 @@ class LiveStreamSession:
                 if ex.response.status_code == 403:
                     self._session_id = self._api.start_session(self._device_uuid)
                 else:
+                    self._session_id = None
                     raise ex
 
     @property
