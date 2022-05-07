@@ -1,50 +1,36 @@
 import logging
 from datetime import datetime, timedelta
-from enum import Enum
 
 import requests
 
+from canary.const import (
+    URL_LOGIN_API,
+    ATTR_USERNAME,
+    ATTR_PASSWORD,
+    ATTR_CLIENT_ID,
+    ATTR_VALUE_CLIENT_ID,
+    ATTR_VALUE_CLIENT_SECRET,
+    ATTR_CLIENT_SECRET,
+    ATTR_GRANT_TYPE,
+    ATTR_VALUE_SCOPE,
+    ATTR_VALUE_GRANT_TYPE,
+    ATTR_SCOPE,
+    HEADER_USER_AGENT,
+    HEADER_VALUE_USER_AGENT,
+    ATTR_TOKEN,
+    URL_MODES_API,
+    ATTR_OBJECTS,
+    URL_LOCATIONS_API,
+    URL_LOCATION_API,
+    DATETIME_FORMAT,
+    URL_READINGS_API,
+    HEADER_AUTHORIZATION,
+    HEADER_VALUE_AUTHORIZATION,
+)
 from canary.live_stream_api import LiveStreamApi, LiveStreamSession
-
-HEADER_AUTHORIZATION = "Authorization"
-HEADER_USER_AGENT = "User-Agent"
-
-HEADER_VALUE_AUTHORIZATION = "Bearer"
-HEADER_VALUE_USER_AGENT = "Canary/5.9.0 (iPhone; iOS 15.4.1; Scale/3.00)"
-
-URL_LOGIN_API = "https://api.canaryis.com/o/access_token/"
-URL_LOCATIONS_API = "https://api.canaryis.com/v1/locations/"
-URL_LOCATION_API = "https://api.canaryis.com/v1/locations/"
-URL_MODES_API = "https://api.canaryis.com/v1/modes/"
-URL_ENTRIES_API = "https://api.canaryis.com/v1/entries/"
-URL_READINGS_API = "https://api.canaryis.com/v1/readings/"
-
-ATTR_USERNAME = "username"
-ATTR_PASSWORD = "password"
-ATTR_CLIENT_ID = "client_id"
-ATTR_CLIENT_SECRET = "client_secret"
-ATTR_GRANT_TYPE = "grant_type"
-ATTR_SCOPE = "scope"
-
-ATTR_VALUE_CLIENT_ID = "a183323eab0544d83808"
-ATTR_VALUE_CLIENT_SECRET = "ba883a083b2d45fa7c6a6567ca7a01e473c3a269"
-ATTR_VALUE_GRANT_TYPE = "password"
-ATTR_VALUE_SCOPE = "write"
-
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+from canary.model import Mode, Location, Reading
 
 _LOGGER = logging.getLogger(__name__)
-
-LOCATION_MODE_HOME = "home"
-LOCATION_MODE_AWAY = "away"
-LOCATION_MODE_NIGHT = "night"
-
-LOCATION_STATE_ARMED = "armed"
-LOCATION_STATE_DISARMED = "disarmed"
-LOCATION_STATE_PRIVACY = "privacy"
-LOCATION_STATE_STANDBY = "standby"
-
-RECORDING_STATES = [LOCATION_STATE_ARMED, LOCATION_STATE_DISARMED]
 
 
 class Api:
@@ -77,20 +63,20 @@ class Api:
         )
 
         _LOGGER.debug(
-            f"Received login response: {response.status_code}, {response.content}"
+            "Received login response: %d, %s", response.status_code, response.content
         )
 
         response.raise_for_status()
 
-        self._token = response.json()["access_token"]
+        self._token = response.json()[ATTR_TOKEN]
         self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
 
     def get_modes(self):
-        json = self._call_api("get", URL_MODES_API).json()["objects"]
+        json = self._call_api("get", URL_MODES_API).json()[ATTR_OBJECTS]
         return [Mode(data) for data in json]
 
     def get_locations(self):
-        json = self._call_api("get", URL_LOCATIONS_API).json()["objects"]
+        json = self._call_api("get", URL_LOCATIONS_API).json()[ATTR_OBJECTS]
         return [Location(data, self._modes_by_name) for data in json]
 
     def get_location(self, location_id):
@@ -124,7 +110,7 @@ class Api:
                 "resolution": "10m",
                 "limit": 0,
             },
-        ).json()["objects"]
+        ).json()[ATTR_OBJECTS]
         return [Reading(data) for data in json]
 
     def get_latest_readings(self, device_id):
@@ -137,9 +123,7 @@ class Api:
 
         return readings_by_type.values()
 
-    def get_entries(
-        self, location_id, last_modified=None
-    ):
+    def get_entries(self, location_id, last_modified=None):
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(
                 self._username, self._password, self._timeout, self._token
@@ -149,12 +133,13 @@ class Api:
         if last_modified is None:
             last_modified = now - timedelta(days=1)
 
-        json = self._live_stream_api.get_entries(location_id,
-                                                 {
-                                                     "end": f"{now.strftime(DATETIME_FORMAT)}",
-                                                     "start": f"{last_modified.strftime(DATETIME_FORMAT)}"
-                                                 })
-        return [Entry(data) for data in json]
+        return self._live_stream_api.get_entries(
+            location_id,
+            {
+                "end": f"{now.strftime(DATETIME_FORMAT)}",
+                "start": f"{last_modified.strftime(DATETIME_FORMAT)}",
+            },
+        )
 
     def get_live_stream_session(self, device):
         if self._live_stream_api is None:
@@ -164,7 +149,7 @@ class Api:
         return LiveStreamSession(self._live_stream_api, device)
 
     def _call_api(self, method, url, params=None, **kwargs):
-        _LOGGER.debug(f"About to call {url} with {params}")
+        _LOGGER.debug("About to call %s with %s", url, params)
 
         response = requests.request(
             method,
@@ -176,7 +161,7 @@ class Api:
         )
 
         _LOGGER.debug(
-            f"Received API response: {response.status_code}, {response.content}"
+            "Received API response: %d, %s", response.status_code, response.content
         )
 
         response.raise_for_status()
@@ -188,218 +173,3 @@ class Api:
             HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
             HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {self._token}",
         }
-
-
-class Customer:
-    def __init__(self, data):
-        self._id = data["id"]
-        self._first_name = data["first_name"]
-        self._last_name = data["last_name"]
-        self._is_celsius = data["celsius"]
-
-    @property
-    def customer_id(self):
-        return self._id
-
-    @property
-    def first_name(self):
-        return self._first_name
-
-    @property
-    def last_name(self):
-        return self._last_name
-
-    @property
-    def is_celsius(self):
-        return self._is_celsius
-
-
-class Location:
-    def __init__(self, data, modes_by_name):
-        self._id = data["id"]
-        self._name = data["name"]
-        self._is_private = data["is_private"]
-        self._devices = []
-        self._customers = []
-
-        mode_name = data.get("mode", {}).get("name", None)
-        self._mode = modes_by_name.get(mode_name, None)
-
-        current_mode_name = data.get("current_mode", {}).get("name", None)
-        self._current_mode = modes_by_name.get(current_mode_name, None)
-
-        for device_data in data["devices"]:
-            self._devices.append(Device(device_data))
-
-        for customer_data in data["customers"]:
-            self._customers.append(Customer(customer_data))
-
-    @property
-    def location_id(self):
-        return self._id
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def mode(self):
-        return self._mode
-
-    @property
-    def current_mode(self):
-        return self._current_mode
-
-    @property
-    def devices(self):
-        return self._devices
-
-    @property
-    def customers(self):
-        return self._customers
-
-    @property
-    def is_private(self):
-        return self._is_private
-
-    @property
-    def is_recording(self):
-        if self.current_mode is None:
-            return False
-
-        return self.current_mode.name in RECORDING_STATES
-
-    @property
-    def is_celsius(self):
-        for customer in self._customers:
-            if customer is not None and customer.is_celsius:
-                return True
-
-        return False
-
-
-class Device:
-    def __init__(self, data):
-        self._id = data["id"]
-        self._uuid = data["uuid"]
-        self._name = data["name"]
-        self._device_mode = None
-        self._is_online = data["online"]
-        self._device_type = data["device_type"]
-
-    @property
-    def device_id(self):
-        return self._id
-
-    @property
-    def uuid(self):
-        return self._uuid
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def device_mode(self):
-        return self._device_mode
-
-    @property
-    def is_online(self):
-        return self._is_online
-
-    @property
-    def device_type(self):
-        return self._device_type
-
-
-class Reading:
-    def __init__(self, data):
-        self._sensor_type = SensorType(data["sensor_type"]["name"])
-        self._value = data["value"]
-
-    @property
-    def sensor_type(self):
-        return self._sensor_type
-
-    @property
-    def value(self):
-        return self._value
-
-
-class SensorType(Enum):
-    AIR_QUALITY = "air_quality"
-    HUMIDITY = "humidity"
-    TEMPERATURE = "temperature"
-    BATTERY = "battery"
-    WIFI = "wifi"
-
-
-class Entry:
-    def __init__(self, data):
-        self._entry_id = data["id"]
-        self._start_time = data.get("start_time", "")
-        self._device_uuids = []
-        self._starred = data.get("starred", False)
-        self._selected = data.get("selected", False)
-        self._thumbnails = []
-
-        for device_data in data.get("device_uuids", []):
-            self._device_uuids.append(device_data)
-
-        for thumbnail_data in data.get("thumbnails", []):
-            self._thumbnails.append(Thumbnail(thumbnail_data))
-
-    @property
-    def entry_id(self):
-        return self._entry_id
-
-    @property
-    def start_time(self):
-        return self._start_time
-
-    @property
-    def device_uuids(self):
-        return self._device_uuids
-
-    @property
-    def starred(self):
-        return self._starred
-
-    @property
-    def selected(self):
-        return self._selected
-
-    @property
-    def thumbnails(self):
-        return self._thumbnails
-
-
-class Thumbnail:
-    def __init__(self, data):
-        self._image_url = data["signed_url"]
-
-    @property
-    def image_url(self):
-        return self._image_url
-
-
-class Mode:
-    def __init__(self, data):
-        self._id = data["id"]
-        self._name = data["name"]
-        self._resource_uri = data["resource_uri"]
-
-    def __repr__(self):
-        return f"Mode(id={self.mode_id}, name={self.name})"
-
-    @property
-    def mode_id(self):
-        return self._id
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def resource_uri(self):
-        return self._resource_uri
