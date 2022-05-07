@@ -48,15 +48,18 @@ RECORDING_STATES = [LOCATION_STATE_ARMED, LOCATION_STATE_DISARMED]
 
 
 class Api:
-    def __init__(self, username, password, timeout=10):
+    def __init__(self, username, password, timeout=10, token=None):
         self._username = username
         self._password = password
         self._timeout = timeout
-        self._token = None
+        self._token = token
         self._modes_by_name = {}
         self._live_stream_api = None
 
-        self.login()
+        if self._token is None:
+            self.login()
+        else:
+            self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
 
     def login(self):
         response = requests.post(
@@ -135,23 +138,22 @@ class Api:
         return readings_by_type.values()
 
     def get_entries(
-        self, location_id, entry_type="motion", limit=1, last_modified=None
+        self, location_id, last_modified=None
     ):
-        if last_modified is None:
-            last_modified = datetime.utcnow() - timedelta(days=3)
+        if self._live_stream_api is None:
+            self._live_stream_api = LiveStreamApi(
+                self._username, self._password, self._timeout, self._token
+            )
 
-        json = self._call_api(
-            "get",
-            URL_ENTRIES_API,
-            {
-                "last_modified__gt": last_modified.strftime(DATETIME_FORMAT),
-                "include_deleted": "True",
-                "offset": "0",
-                "location": location_id,
-                "limit": limit,
-                "entry_type": entry_type,
-            },
-        ).json()["objects"]
+        now = datetime.utcnow()
+        if last_modified is None:
+            last_modified = now - timedelta(days=1)
+
+        json = self._live_stream_api.get_entries(location_id,
+                                                 {
+                                                     "end": f"{now.strftime(DATETIME_FORMAT)}",
+                                                     "start": f"{last_modified.strftime(DATETIME_FORMAT)}"
+                                                 })
         return [Entry(data) for data in json]
 
     def get_live_stream_session(self, device):
@@ -335,11 +337,14 @@ class SensorType(Enum):
 class Entry:
     def __init__(self, data):
         self._entry_id = data["id"]
-        self._description = data.get("description", "")
-        self._entry_type = data.get("entry_type", "")
         self._start_time = data.get("start_time", "")
-        self._end_time = data.get("end_time", "")
+        self._device_uuids = []
+        self._starred = data.get("starred", False)
+        self._selected = data.get("selected", False)
         self._thumbnails = []
+
+        for device_data in data.get("device_uuids", []):
+            self._device_uuids.append(device_data)
 
         for thumbnail_data in data.get("thumbnails", []):
             self._thumbnails.append(Thumbnail(thumbnail_data))
@@ -349,20 +354,20 @@ class Entry:
         return self._entry_id
 
     @property
-    def description(self):
-        return self._description
-
-    @property
-    def entry_type(self):
-        return self._entry_type
-
-    @property
     def start_time(self):
         return self._start_time
 
     @property
-    def end_time(self):
-        return self._end_time
+    def device_uuids(self):
+        return self._device_uuids
+
+    @property
+    def starred(self):
+        return self._starred
+
+    @property
+    def selected(self):
+        return self._selected
 
     @property
     def thumbnails(self):
@@ -371,7 +376,7 @@ class Entry:
 
 class Thumbnail:
     def __init__(self, data):
-        self._image_url = data["image_url"]
+        self._image_url = data["signed_url"]
 
     @property
     def image_url(self):

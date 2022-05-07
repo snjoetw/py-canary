@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from requests import HTTPError
 
@@ -12,6 +14,7 @@ HEADER_VALUE_AUTHORIZATION = "Bearer"
 URL_LOGIN_PAGE = "https://my.canary.is/manifest.json"
 URL_LOGIN_API = "https://api-prod.canaryis.com/o/access_token/"
 URL_WATCHLIVE_BASE = "https://my.canary.is/api/watchlive/"
+URL_ENTRIES_API = "https://my.canary.is/api/entries/tl2/"
 
 ATTR_USERNAME = "username"
 ATTR_PASSWORD = "password"
@@ -25,24 +28,32 @@ ATTR_VALUE_CLIENT_ID = "53e67d00de5638b3d8f7"
 ATTR_VALUE_GRANT_TYPE = "password"
 ATTR_VALUE_SCOPE = "write"
 
+_LOGGER = logging.getLogger(__name__)
+
 
 class LiveStreamApi:
-    def __init__(self, username, password, timeout=10):
+    def __init__(self, username, password, timeout=10, token=None):
         self._username = username
         self._password = password
         self._timeout = timeout
-        self._token = None
+        self._token = token
         self._ssesyranac = None
         self._xsrf_token = None
 
-        self.login()
+        self.pre_login()
+        if token is None:
+            self.login()
 
-    def login(self):
+    def pre_login(self):
         response = requests.get(URL_LOGIN_PAGE)
 
         xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
         ssesyranac = response.cookies[COOKIE_SSESYRANAC]
 
+        self._ssesyranac = ssesyranac
+        self._xsrf_token = xsrf_token
+
+    def login(self):
         response = requests.post(
             URL_LOGIN_API,
             {
@@ -52,16 +63,10 @@ class LiveStreamApi:
                 ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
                 ATTR_SCOPE: ATTR_VALUE_SCOPE,
             },
-            headers={HEADER_XSRF_TOKEN: xsrf_token},
-            cookies={
-                COOKIE_XSRF_TOKEN: xsrf_token,
-                COOKIE_SSESYRANAC: ssesyranac,
-            },
+            headers=self._api_headers(),
+            cookies=self._api_cookies(),
         )
-
-        self._ssesyranac = ssesyranac
         self._token = response.json()[ATTR_TOKEN]
-        self._xsrf_token = xsrf_token
 
     def start_session(self, device_uuid):
         response = requests.post(
@@ -92,8 +97,36 @@ class LiveStreamApi:
 
         return "message" in json and json["message"] == "success"
 
+    def get_entries(self, location_id, params):
+        return self._call_api(
+            "get",
+            f"{URL_ENTRIES_API}{location_id}",
+            params=params,
+        ).json()
+
     def get_live_stream_url(self, device_id, session_id):
         return f"{URL_WATCHLIVE_BASE}{device_id}/{session_id}/stream.m3u8"
+
+    def _call_api(self, method, url, params=None, **kwargs):
+        _LOGGER.debug(f"About to call {url} with {params}")
+
+        response = requests.request(
+            method,
+            url,
+            params=params,
+            timeout=self._timeout,
+            headers=self._api_headers(),
+            cookies=self._api_cookies(),
+            **kwargs,
+        )
+
+        _LOGGER.debug(
+            f"Received API response: {response.status_code}, {response.content}"
+        )
+
+        response.raise_for_status()
+
+        return response
 
     def _api_cookies(self):
         return {
@@ -115,8 +148,9 @@ class LiveStreamSession:
         self._device_id = device.device_id
         self._session_id = None
 
-    @property
-    def live_stream_url(self):
+        self.start_renew_session()
+
+    def start_renew_session(self):
         if self._session_id is None:
             self._session_id = self._api.start_session(self._device_uuid)
         else:
@@ -128,4 +162,8 @@ class LiveStreamSession:
                 else:
                     raise ex
 
+    @property
+    def live_stream_url(self):
+        if self._session_id is None:
+            return None
         return self._api.get_live_stream_url(self._device_id, self._session_id)
