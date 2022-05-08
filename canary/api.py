@@ -27,6 +27,7 @@ from canary.const import (
     HEADER_AUTHORIZATION,
     HEADER_VALUE_AUTHORIZATION,
     DATETIME_FORMAT_NOTZ,
+    DATETIME_MS_FORMAT,
 )
 from canary.live_stream_api import LiveStreamApi, LiveStreamSession
 from canary.model import Mode, Location, Reading
@@ -132,16 +133,16 @@ class Api:
 
         utc_offset = datetime.utcnow() - datetime.now()
         today = date.today()
-        begintime = today.strftime("%Y-%m-%d 00:00:00")
+        begintime = today.strftime("%Y-%m-%d 00:00:00.001")
         utc_begintime = datetime.strptime(begintime, DATETIME_FORMAT_NOTZ) + utc_offset
-        endtime = today.strftime("%Y-%m-%d 23:59:59")
+        endtime = today.strftime("%Y-%m-%d 23:59:59.99999")
         utc_endtime = datetime.strptime(endtime, DATETIME_FORMAT_NOTZ) + utc_offset
 
         return self._live_stream_api.get_entries(
             location_id,
             {
-                "end": f"{utc_endtime.strftime(DATETIME_FORMAT)}",
-                "start": f"{utc_begintime.strftime(DATETIME_FORMAT)}",
+                "end": f"{utc_endtime.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
+                "start": f"{utc_begintime.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
             },
         )
 
