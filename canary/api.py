@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import requests
 
@@ -26,6 +26,7 @@ from canary.const import (
     URL_READINGS_API,
     HEADER_AUTHORIZATION,
     HEADER_VALUE_AUTHORIZATION,
+    DATETIME_FORMAT_NOTZ,
 )
 from canary.live_stream_api import LiveStreamApi, LiveStreamSession
 from canary.model import Mode, Location, Reading
@@ -123,21 +124,24 @@ class Api:
 
         return readings_by_type.values()
 
-    def get_entries(self, location_id, last_modified=None):
+    def get_entries(self, location_id):
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(
                 self._username, self._password, self._timeout, self._token
             )
 
-        now = datetime.utcnow()
-        if last_modified is None:
-            last_modified = now - timedelta(days=1)
+        utc_offset = datetime.utcnow() - datetime.now()
+        today = date.today()
+        begintime = today.strftime("%Y-%m-%d 00:00:00")
+        utc_begintime = datetime.strptime(begintime, DATETIME_FORMAT_NOTZ) + utc_offset
+        endtime = today.strftime("%Y-%m-%d 23:59:59")
+        utc_endtime = datetime.strptime(endtime, DATETIME_FORMAT_NOTZ) + utc_offset
 
         return self._live_stream_api.get_entries(
             location_id,
             {
-                "end": f"{now.strftime(DATETIME_FORMAT)}",
-                "start": f"{last_modified.strftime(DATETIME_FORMAT)}",
+                "end": f"{utc_endtime.strftime(DATETIME_FORMAT)}",
+                "start": f"{utc_begintime.strftime(DATETIME_FORMAT)}",
             },
         )
 

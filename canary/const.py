@@ -31,6 +31,7 @@ ATTR_VALUE_GRANT_TYPE = "password"
 ATTR_VALUE_SCOPE = "write"
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DATETIME_FORMAT_NOTZ = "%Y-%m-%d %H:%M:%S"
 
 LOCATION_MODE_HOME = "home"
 LOCATION_MODE_AWAY = "away"
