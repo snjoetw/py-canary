@@ -146,6 +146,17 @@ class Api:
             },
         )
 
+    def get_latest_entries(self, location_id):
+        entries = self.get_entries(location_id)
+        entries_by_device_uuid = {}
+
+        for entry in entries:
+            for device_uuid in entry.device_uuids:
+                if device_uuid not in entries_by_device_uuid:
+                    entries_by_device_uuid[device_uuid] = entry
+
+        return entries_by_device_uuid.values()
+
     def get_live_stream_session(self, device):
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(
