@@ -160,7 +160,7 @@ class Api:
     def get_live_stream_session(self, device):
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(
-                self._username, self._password, self._timeout
+                self._username, self._password, self._timeout, self._token
             )
         return LiveStreamSession(self._live_stream_api, device)
 
