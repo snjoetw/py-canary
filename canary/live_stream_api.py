@@ -63,18 +63,6 @@ class LiveStreamApi:
                 ATTR_SCOPE: ATTR_VALUE_SCOPE,
             },
         )
-        # response = requests.post(
-        #     URL_LOGIN_API,
-        #     {
-        #         ATTR_USERNAME: self._username,
-        #         ATTR_PASSWORD: self._password,
-        #         ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-        #         ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
-        #         ATTR_SCOPE: ATTR_VALUE_SCOPE,
-        #     },
-        #     headers=self._api_headers(),
-        #     cookies=self._api_cookies(),
-        # )
         self._token = response.json()[ATTR_TOKEN]
 
     def start_session(self, device_uuid):
@@ -83,12 +71,6 @@ class LiveStreamApi:
             f"{URL_WATCHLIVE_BASE}{device_uuid}/session",
             json={"deviceUUID": device_uuid},
         )
-        # response = requests.post(
-        #     f"{URL_WATCHLIVE_BASE}{device_uuid}/session",
-        #     headers=self._api_headers(),
-        #     cookies=self._api_cookies(),
-        #     json={"deviceUUID": device_uuid},
-        # )
         response.raise_for_status()
 
         session_id = response.json().get(ATTR_SESSION_ID)
@@ -104,12 +86,6 @@ class LiveStreamApi:
             f"{URL_WATCHLIVE_BASE}{device_uuid}/send",
             json={ATTR_SESSION_ID: session_id},
         )
-        # response = requests.post(
-        #     f"{URL_WATCHLIVE_BASE}{device_uuid}/send",
-        #     headers=self._api_headers(),
-        #     cookies=self._api_cookies(),
-        #     json={ATTR_SESSION_ID: session_id},
-        # )
         response.raise_for_status()
 
         json = response.json()
