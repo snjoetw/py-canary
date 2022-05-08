@@ -157,7 +157,9 @@ class Entry:
         self._thumbnails = []
 
         for device_data in data.get("device_uuids", []):
-            self._device_uuids.append(device_data)
+            # for whatever reason, this call has hyphens in the uuid's
+            # while all others do not
+            self._device_uuids.append(device_data.replace("-", ""))
 
         for thumbnail_data in data.get("thumbnails", []):
             self._thumbnails.append(Thumbnail(thumbnail_data))
