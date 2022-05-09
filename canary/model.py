@@ -1,6 +1,7 @@
 from enum import Enum
+from datetime import datetime
 
-from canary.const import RECORDING_STATES
+from canary.const import RECORDING_STATES, DATETIME_FORMAT_NOTZ
 
 
 class Customer:
@@ -145,6 +146,7 @@ class SensorType(Enum):
     TEMPERATURE = "temperature"
     BATTERY = "battery"
     WIFI = "wifi"
+    DATE_LAST_ENTRY = "date_last_entry"
 
 
 class Entry:
@@ -170,7 +172,10 @@ class Entry:
 
     @property
     def start_time(self):
-        return self._start_time
+        try:
+            return datetime.strptime(self._start_time, DATETIME_FORMAT_NOTZ)
+        except ValueError:
+            return None
 
     @property
     def device_uuids(self):
