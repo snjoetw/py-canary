@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 import requests
@@ -63,6 +65,13 @@ class LiveStreamApi:
                 ATTR_SCOPE: ATTR_VALUE_SCOPE,
             },
         )
+
+        _LOGGER.debug(
+            "Received API response: %d, %s", response.status_code, response.content
+        )
+
+        response.raise_for_status()
+
         self._token = response.json()[ATTR_TOKEN]
 
     def start_session(self, device_uuid):
@@ -135,6 +144,10 @@ class LiveStreamApi:
             HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {self._token}",
         }
 
+    @property
+    def auth_token(self) -> str | None:
+        return self._token
+
 
 class LiveStreamSession:
     def __init__(self, api, device):
@@ -159,7 +172,13 @@ class LiveStreamSession:
                     raise ex
 
     @property
-    def live_stream_url(self):
+    def live_stream_url(self) -> str | None:
         if self._session_id is None:
             return None
         return self._api.get_live_stream_url(self._device_id, self._session_id)
+
+    @property
+    def auth_token(self) -> str | None:
+        if self._api is None:
+            return None
+        return self._api.auth_token

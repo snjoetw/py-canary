@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime, timedelta, date
 
@@ -191,3 +193,7 @@ class Api:
             HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
             HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {self._token}",
         }
+
+    @property
+    def auth_token(self) -> str | None:
+        return self._token
