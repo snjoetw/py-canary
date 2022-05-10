@@ -1,7 +1,9 @@
-from enum import Enum
-from datetime import datetime
+from __future__ import annotations
 
-from canary.const import RECORDING_STATES, DATETIME_FORMAT_NOTZ
+from enum import Enum
+from datetime import datetime, timezone
+
+from canary.const import RECORDING_STATES, DATETIME_FORMAT
 
 
 class Customer:
@@ -147,6 +149,7 @@ class SensorType(Enum):
     BATTERY = "battery"
     WIFI = "wifi"
     DATE_LAST_ENTRY = "date_last_entry"
+    ENTRIES_CAPTURED_TODAY = "entries_captured_today"
 
 
 class Entry:
@@ -171,9 +174,9 @@ class Entry:
         return self._entry_id
 
     @property
-    def start_time(self):
+    def start_time(self) -> datetime | None:
         try:
-            return datetime.strptime(self._start_time, DATETIME_FORMAT_NOTZ)
+            return datetime.strptime(self._start_time + "Z", DATETIME_FORMAT).replace(tzinfo=timezone.utc)
         except ValueError:
             return None
 
