@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 import requests
@@ -145,7 +143,7 @@ class LiveStreamApi:
         }
 
     @property
-    def auth_token(self) -> str | None:
+    def auth_token(self):  # -> str | None:
         return self._token
 
 
@@ -172,13 +170,13 @@ class LiveStreamSession:
                     raise ex
 
     @property
-    def live_stream_url(self) -> str | None:
+    def live_stream_url(self):  # -> str | None:
         if self._session_id is None:
             return None
         return self._api.get_live_stream_url(self._device_id, self._session_id)
 
     @property
-    def auth_token(self) -> str | None:
+    def auth_token(self):  # -> str | None:
         if self._api is None:
             return None
         return self._api.auth_token

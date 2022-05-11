@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from datetime import datetime, timedelta, date
 
@@ -133,20 +131,13 @@ class Api:
                 self._username, self._password, self._timeout, self._token
             )
 
-        utc_offset = datetime.utcnow() - datetime.now()
-        today = date.today()
-        begintime = today.strftime("%Y-%m-%d 00:00:00.001")
-        utc_begintime = (
-            datetime.strptime(begintime, DATETIME_MS_FORMAT_NOTZ) + utc_offset
-        )
-        endtime = today.strftime("%Y-%m-%d 23:59:59.99999")
-        utc_endtime = datetime.strptime(endtime, DATETIME_MS_FORMAT_NOTZ) + utc_offset
+        utc_beginning, utc_ending = self._get_todays_date_range_utc()
 
         return self._live_stream_api.get_entries(
             location_id,
             {
-                "end": f"{utc_endtime.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
-                "start": f"{utc_begintime.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
+                "end": f"{utc_ending.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
+                "start": f"{utc_beginning.strftime(DATETIME_MS_FORMAT)[:-3]}Z",
             },
         )
 
@@ -167,6 +158,17 @@ class Api:
                 self._username, self._password, self._timeout, self._token
             )
         return LiveStreamSession(self._live_stream_api, device)
+
+    def _get_todays_date_range_utc(self):
+        utc_offset = datetime.utcnow() - datetime.now()
+        today = date.today()
+        beginning = today.strftime("%Y-%m-%d 00:00:00.001")
+        utc_beginning = (
+            datetime.strptime(beginning, DATETIME_MS_FORMAT_NOTZ) + utc_offset
+        )
+        ending = today.strftime("%Y-%m-%d 23:59:59.99999")
+        utc_ending = datetime.strptime(ending, DATETIME_MS_FORMAT_NOTZ) + utc_offset
+        return utc_beginning, utc_ending
 
     def _call_api(self, method, url, params=None, **kwargs):
         _LOGGER.debug("About to call %s with %s", url, params)
@@ -195,5 +197,5 @@ class Api:
         }
 
     @property
-    def auth_token(self) -> str | None:
+    def auth_token(self):  # -> str | None:
         return self._token

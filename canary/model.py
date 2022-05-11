@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 from datetime import datetime, timezone
 
@@ -174,9 +172,11 @@ class Entry:
         return self._entry_id
 
     @property
-    def start_time(self) -> datetime | None:
+    def start_time(self):  # -> datetime | None:
         try:
-            return datetime.strptime(self._start_time + "Z", DATETIME_FORMAT).replace(tzinfo=timezone.utc)
+            return datetime.strptime(self._start_time + "Z", DATETIME_FORMAT).replace(
+                tzinfo=timezone.utc
+            )
         except ValueError:
             return None
 
