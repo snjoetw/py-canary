@@ -146,7 +146,7 @@ class SensorType(Enum):
     TEMPERATURE = "temperature"
     BATTERY = "battery"
     WIFI = "wifi"
-    DATE_LAST_ENTRY = "date_last_entry"
+    DATE_LAST_ENTRY = "last_entry_date"
     ENTRIES_CAPTURED_TODAY = "entries_captured_today"
 
 
