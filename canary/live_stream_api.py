@@ -23,6 +23,7 @@ from canary.const import (
     HEADER_XSRF_TOKEN,
     HEADER_AUTHORIZATION,
     HEADER_VALUE_AUTHORIZATION,
+    ATTR_DEVICE_UUID,
 )
 from canary.model import Entry
 
@@ -99,6 +100,23 @@ class LiveStreamApi:
 
         return "message" in json and json["message"] == "success"
 
+    def stop_session(self, device_uuid, session_id):
+        """Ends the session"""
+        response = self._call_api(
+            "post",
+            f"{URL_WATCHLIVE_BASE}{device_uuid}/stop",
+            json={
+                ATTR_DEVICE_UUID: device_uuid,
+                ATTR_SESSION_ID: session_id,
+                "action": "delete",
+            },
+        )
+        response.raise_for_status()
+
+        json = response.json()
+
+        return "message" in json and json["message"] == "success"
+
     def get_entries(self, location_id, params):
         json = self._call_api(
             "get", f"{URL_ENTRIES_API}{location_id}", params=params
@@ -168,6 +186,13 @@ class LiveStreamSession:
                 else:
                     self._session_id = None
                     raise ex
+
+    def stop_session(self) -> None:
+        self._api.stop_session(self._device_uuid, self._session_id)
+        self.clear_session()
+
+    def clear_session(self) -> None:
+        self._session_id = None
 
     @property
     def live_stream_url(self):  # -> str | None:

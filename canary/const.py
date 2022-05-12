@@ -22,6 +22,7 @@ ATTR_GRANT_TYPE = "grant_type"
 ATTR_SCOPE = "scope"
 ATTR_TOKEN = "access_token"
 ATTR_SESSION_ID = "sessionId"
+ATTR_DEVICE_UUID = "deviceUUID"
 ATTR_OBJECTS = "objects"
 
 ATTR_VALUE_CLIENT_ID = "a183323eab0544d83808"
