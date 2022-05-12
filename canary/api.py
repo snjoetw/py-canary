@@ -162,7 +162,7 @@ class Api:
     def _get_todays_date_range_utc(self):
         utc_offset = datetime.utcnow() - datetime.now()
         today = date.today()
-        beginning = today.strftime("%Y-%m-%d 00:00:00.001")
+        beginning = today.strftime("%Y-%m-%d 00:00:00.0001")
         utc_beginning = (
             datetime.strptime(beginning, DATETIME_MS_FORMAT_NOTZ) + utc_offset
         )

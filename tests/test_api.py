@@ -20,7 +20,9 @@ from canary.model import SensorType
 COOKIE_XSRF_VAL = "xsrf"
 COOKIE_COOKIE_SSESYRANAC_VAL = "ssesyranac"
 
-FIXED_DATE_RANGE = "?end=2022-05-05T23%3A59%3A59Z&start=2022-05-05T00%3A00%3A00Z"
+FIXED_DATE_RANGE = (
+    "?end=2022-05-05T23%3A59%3A59.999Z&start=2022-05-05T00%3A00%3A00.000Z"
+)
 URL_ENTRY_API = f"https://my.canary.is/api/entries/tl2/70001{FIXED_DATE_RANGE}"
 
 
@@ -98,7 +100,7 @@ class TestApi(unittest.TestCase):
 
         entry = entries[0]
         self.assertEqual("00000000-0000-0000-0001-000000000000", entry.entry_id)
-        self.assertEqual("2022-05-06T00:08:14", entry.start_time)
+        self.assertEqual("2022-05-06 00:08:14+00:00", str(entry.start_time))
         self.assertEqual(False, entry.starred)
         self.assertEqual(False, entry.selected)
         self.assertEqual(1, len(entry.thumbnails))
@@ -108,7 +110,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual("https://image_url.com", thumbnail.image_url)
 
         device_uuid = entry.device_uuids[0]
-        self.assertEqual("ffffffff-feed-ffff-ffff-ffffffffffff", device_uuid)
+        self.assertEqual("fffffffffeedffffffffffffffffffff", device_uuid)
 
     @requests_mock.Mocker()
     def test_device_with_readings(self, mock):
