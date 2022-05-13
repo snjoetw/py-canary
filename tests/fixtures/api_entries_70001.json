@@ -1,34 +1,34 @@
-{
-  "meta": {
-    "limit": 1,
-    "next": null,
-    "offset": 0,
-    "previous": null,
-    "total_count": 0
-  },
-  "objects": [
-    {
-      "comments": [],
-      "customers": [],
-      "deleted": false,
-      "description": "Activity detected in away mode",
-      "device_mode": {
-        "id": 2,
-        "name": "armed",
-        "resource_uri": "/v1/modes/2/"
-      },
-      "duration": 600,
-      "end_time": "2017-11-19T07:00:44",
-      "entry_type": "motion",
-      "id": 60001,
-      "last_modified": "2017-11-19T06:56:46",
-      "location": "/v1/locations/70001/",
-      "start_time": "2017-11-19T06:50:44",
-      "thumbnails": [
-        {
-          "image_url": "https://image_url.com"
-        }
-      ]
-    }
-  ]
-}
+[
+	{
+		"id": "00000000-0000-0000-0001-000000000000",
+		"start_time": "2022-05-06T00:08:14",
+		"thumbnails": [
+			{
+				"device_id": "ffffffff-feed-ffff-ffff-ffffffffffff",
+				"signed_url": "https://image_url.com",
+				"start_time": 1651795694
+			}
+		],
+		"device_uuids": [
+			"ffffffff-feed-ffff-ffff-ffffffffffff"
+		],
+		"starred": false,
+		"selected": false
+	},
+	{
+		"id": "00000000-0000-0000-0003-000000000000",
+		"start_time": "2022-05-05T22:14:40",
+		"thumbnails": [
+			{
+				"device_id": "ffffffff-feed-ffff-ffff-ffffffffffff",
+				"signed_url": "https://image_url.com",
+				"start_time": 1651788880
+			}
+		],
+		"device_uuids": [
+			"ffffffff-feed-ffff-ffff-ffffffffffff"
+		],
+		"starred": false,
+		"selected": false
+	}
+]
