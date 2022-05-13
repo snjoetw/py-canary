@@ -77,7 +77,7 @@ class LiveStreamApi:
         response = self._call_api(
             "post",
             f"{URL_WATCHLIVE_BASE}{device_uuid}/session",
-            json={"deviceUUID": device_uuid},
+            json={},  # "deviceUUID": device_uuid},
         )
         response.raise_for_status()
 
