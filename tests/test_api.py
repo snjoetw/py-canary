@@ -2,44 +2,62 @@
 import os
 import unittest
 
+import pytest
 import requests_mock
 
-from canary.api import Api, URL_LOGIN_API, URL_MODES_API, URL_LOCATIONS_API, \
-    SensorType, URL_ENTRIES_API, URL_READINGS_API
+from canary.api import Api
+from canary.const import (
+    URL_LOGIN_API,
+    URL_MODES_API,
+    URL_LOCATIONS_API,
+    URL_READINGS_API,
+    URL_LOGIN_PAGE,
+    COOKIE_XSRF_TOKEN,
+    COOKIE_SSESYRANAC,
+)
+from canary.model import SensorType
+
+COOKIE_XSRF_VAL = "xsrf"
+COOKIE_COOKIE_SSESYRANAC_VAL = "ssesyranac"
+
+FIXED_DATE_RANGE = (
+    "?end=2022-05-05T23%3A59%3A59.999Z&start=2022-05-05T00%3A00%3A00.000Z"
+)
+URL_ENTRY_API = f"https://my.canary.is/api/entries/tl2/70001{FIXED_DATE_RANGE}"
 
 
 def load_fixture(filename):
     """Load a fixture."""
-    path = os.path.join(os.path.dirname(__file__), 'fixtures', filename)
+    path = os.path.join(os.path.dirname(__file__), "fixtures", filename)
     with open(path) as fptr:
         return fptr.read()
 
 
 def _setup_responses(mock):
+    mock.register_uri("POST", URL_LOGIN_API, text=load_fixture("api_login.json"))
+
+    mock.register_uri("GET", URL_MODES_API, text=load_fixture("api_modes.json"))
+
+    mock.register_uri("GET", URL_LOCATIONS_API, text=load_fixture("api_locations.json"))
+
     mock.register_uri(
-        "POST",
-        URL_LOGIN_API,
-        text=load_fixture("api_login.json"))
+        "GET", URL_READINGS_API, text=load_fixture("api_readings_80005.json")
+    )
 
     mock.register_uri(
         "GET",
-        URL_MODES_API,
-        text=load_fixture("api_modes.json"))
+        URL_LOGIN_PAGE,
+        cookies={
+            COOKIE_XSRF_TOKEN: COOKIE_XSRF_VAL,
+            COOKIE_SSESYRANAC: COOKIE_COOKIE_SSESYRANAC_VAL,
+        },
+    )
 
     mock.register_uri(
         "GET",
-        URL_LOCATIONS_API,
-        text=load_fixture("api_locations.json"))
-
-    mock.register_uri(
-        "GET",
-        URL_ENTRIES_API,
-        text=load_fixture("api_entries_70001.json"))
-
-    mock.register_uri(
-        "GET",
-        URL_READINGS_API,
-        text=load_fixture("api_readings_80005.json"))
+        URL_ENTRY_API,
+        text=load_fixture("api_entries_70001.json"),
+    )
 
 
 class TestApi(unittest.TestCase):
@@ -70,6 +88,7 @@ class TestApi(unittest.TestCase):
                 self.assertEqual("standby", location.current_mode.name)
                 self.assertEqual(70002, location.location_id)
 
+    @pytest.mark.freeze_time("2022-05-05")
     @requests_mock.Mocker()
     def test_location_with_motion_entry(self, mock):
         """Test the Canary entries API."""
@@ -77,18 +96,21 @@ class TestApi(unittest.TestCase):
         api = Api("user", "pass")
 
         entries = api.get_entries(70001)
-        self.assertEqual(1, len(entries))
+        self.assertEqual(2, len(entries))
 
         entry = entries[0]
-        self.assertEqual(60001, entry.entry_id)
-        self.assertEqual("Activity detected in away mode", entry.description)
-        self.assertEqual("motion", entry.entry_type)
-        self.assertEqual("2017-11-19T06:50:44", entry.start_time)
-        self.assertEqual("2017-11-19T07:00:44", entry.end_time)
+        self.assertEqual("00000000-0000-0000-0001-000000000000", entry.entry_id)
+        self.assertEqual("2022-05-06 00:08:14+00:00", str(entry.start_time))
+        self.assertEqual(False, entry.starred)
+        self.assertEqual(False, entry.selected)
         self.assertEqual(1, len(entry.thumbnails))
+        self.assertEqual(1, len(entry.device_uuids))
 
         thumbnail = entry.thumbnails[0]
         self.assertEqual("https://image_url.com", thumbnail.image_url)
+
+        device_uuid = entry.device_uuids[0]
+        self.assertEqual("fffffffffeedffffffffffffffffffff", device_uuid)
 
     @requests_mock.Mocker()
     def test_device_with_readings(self, mock):
