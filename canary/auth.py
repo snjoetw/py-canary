@@ -13,13 +13,15 @@ from canary.const import (
     ATTR_PASSWORD,
     ATTR_CLIENT_ID,
     ATTR_VALUE_CLIENT_ID,
-    ATTR_VALUE_CLIENT_SECRET,
-    ATTR_CLIENT_SECRET,
     ATTR_GRANT_TYPE,
     ATTR_VALUE_GRANT_TYPE,
     ATTR_SCOPE,
     ATTR_VALUE_SCOPE,
     URL_LOGIN_API,
+    URL_LOGIN_PAGE,
+    COOKIE_XSRF_TOKEN,
+    COOKIE_SSESYRANAC,
+    HEADER_XSRF_TOKEN,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,6 +49,9 @@ class Auth:
         self._login_response = None
         self.is_errored = False
         self.no_prompt = no_prompt
+        self.otp = None
+        self._ssesyranac = None
+        self._xsrf_token = None
 
     @property
     def login_attributes(self):
@@ -67,8 +72,26 @@ class Auth:
         if not self.no_prompt:
             self._data = util.prompt_login_data(self._data)
 
+    def pre_login(self):
+        response = requests.get(URL_LOGIN_PAGE)
+
+        xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
+        ssesyranac = response.cookies[COOKIE_SSESYRANAC]
+
+        self._ssesyranac = ssesyranac
+        self._xsrf_token = xsrf_token
+
     def login(self):
         self.validate_login()
+
+        self.pre_login()
+
+        headers = {
+            HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
+            "accept": "application/json",
+        }
+        if self.otp:
+            headers["X-OTP"] = self.otp
 
         response = requests.post(
             URL_LOGIN_API,
@@ -76,12 +99,11 @@ class Auth:
                 ATTR_USERNAME: self._username,
                 ATTR_PASSWORD: self._password,
                 ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-                ATTR_CLIENT_SECRET: ATTR_VALUE_CLIENT_SECRET,
                 ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
                 ATTR_SCOPE: ATTR_VALUE_SCOPE,
             },
             timeout=TIMEOUT,
-            headers={HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT},
+            headers=headers,
         )
 
         _LOGGER.debug(
@@ -91,6 +113,40 @@ class Auth:
         self._login_response = self.validate_response(response, True)
         # response.raise_for_status()
 
+        if self.check_key_required():
+            # MFA is enabled...
+            headers["content-type"] = "application/json"
+            # headers["origin"] = "https://my.canary.is"
+            # headers["referer"] = "https://my.canary.is/login"
+            headers[HEADER_XSRF_TOKEN] = self._xsrf_token
+            try:
+                response = requests.post(
+                    "https://my.canary.is/mfa/challenge/login",
+                    json={
+                        ATTR_USERNAME: self._username,
+                        ATTR_PASSWORD: self._password,
+                    },
+                    timeout=5,
+                    headers=headers,
+                    cookies=self._api_cookies(),
+                )
+                _LOGGER.debug(
+                    "Received login response: %d, %s",
+                    response.status_code,
+                    response.content,
+                )
+            except requests.Timeout:
+                pass
+            except requests.exceptions.RequestException as error:
+                raise CanaryBadResponse from error
+
+            if not self.no_prompt:
+                self.otp = input("OTP:")
+
+                self.login()
+            return
+
+        self.otp = None
         self._token = self._login_response.get(ATTR_TOKEN, None)
 
     def validate_response(self, response, json_resp):
@@ -112,6 +168,27 @@ class Auth:
         except (AttributeError, ValueError) as error:
             raise CanaryBadResponse from error
         return None
+
+    def startup(self):
+        """Initialize tokens for communication."""
+        self.validate_login()
+        self.pre_login()
+
+    def check_key_required(self):
+        """Check if 2FA key is required."""
+        try:
+            error_message = self._login_response.get("error", "")
+            if "mfa_required" in error_message:
+                return True
+        except (KeyError, TypeError):
+            pass
+        return False
+
+    def _api_cookies(self):
+        return {
+            COOKIE_XSRF_TOKEN: self._xsrf_token,
+            COOKIE_SSESYRANAC: self._ssesyranac,
+        }
 
 
 class TokenRefreshFailed(Exception):

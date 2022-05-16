@@ -29,6 +29,7 @@ class Api:
         self._live_stream_api = None
 
         if self._auth.login_attributes["token"] is None:
+            self._auth.pre_login()
             self._auth.login()
 
         self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
