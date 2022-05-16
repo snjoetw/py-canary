@@ -4,6 +4,8 @@ HEADER_USER_AGENT = "User-Agent"
 HEADER_VALUE_AUTHORIZATION = "Bearer"
 HEADER_VALUE_USER_AGENT = "Canary/5.9.0 (iPhone; iOS 15.4.1; Scale/3.00)"
 
+TIMEOUT = 10
+
 URL_LOGIN_PAGE = "https://my.canary.is/manifest.json"
 URL_WATCHLIVE_BASE = "https://my.canary.is/api/watchlive/"
 # URL_LOGIN_API = "https://api-prod.canaryis.com/o/access_token/"

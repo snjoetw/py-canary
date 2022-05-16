@@ -7,41 +7,29 @@ from canary.const import (
     URL_LOGIN_PAGE,
     COOKIE_XSRF_TOKEN,
     COOKIE_SSESYRANAC,
-    URL_LOGIN_API,
-    ATTR_USERNAME,
-    ATTR_PASSWORD,
-    ATTR_CLIENT_ID,
-    ATTR_VALUE_CLIENT_ID,
-    ATTR_VALUE_GRANT_TYPE,
-    ATTR_GRANT_TYPE,
-    ATTR_SCOPE,
-    ATTR_VALUE_SCOPE,
-    ATTR_TOKEN,
     URL_WATCHLIVE_BASE,
     ATTR_SESSION_ID,
-    URL_ENTRIES_API,
     HEADER_XSRF_TOKEN,
     HEADER_AUTHORIZATION,
     HEADER_VALUE_AUTHORIZATION,
     ATTR_DEVICE_UUID,
+    TIMEOUT,
 )
-from canary.model import Entry
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class LiveStreamApi:
-    def __init__(self, username, password, timeout=10, token=None):
-        self._username = username
-        self._password = password
-        self._timeout = timeout
+    def __init__(self, token=None, timeout=TIMEOUT):
         self._token = token
+        self._timeout = timeout
         self._ssesyranac = None
         self._xsrf_token = None
 
         self.pre_login()
         if token is None:
-            self.login()
+            # error out, need token
+            return
 
     def pre_login(self):
         response = requests.get(URL_LOGIN_PAGE)
@@ -51,27 +39,6 @@ class LiveStreamApi:
 
         self._ssesyranac = ssesyranac
         self._xsrf_token = xsrf_token
-
-    def login(self):
-        response = self._call_api(
-            "post",
-            URL_LOGIN_API,
-            params={
-                ATTR_USERNAME: self._username,
-                ATTR_PASSWORD: self._password,
-                ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-                ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
-                ATTR_SCOPE: ATTR_VALUE_SCOPE,
-            },
-        )
-
-        _LOGGER.debug(
-            "Received API response: %d, %s", response.status_code, response.content
-        )
-
-        response.raise_for_status()
-
-        self._token = response.json()[ATTR_TOKEN]
 
     def start_session(self, device_uuid):
         response = self._call_api(
@@ -116,13 +83,6 @@ class LiveStreamApi:
         json = response.json()
 
         return "message" in json and json["message"] == "success"
-
-    def get_entries(self, location_id, params):
-        json = self._call_api(
-            "get", f"{URL_ENTRIES_API}{location_id}", params=params
-        ).json()
-
-        return [Entry(data) for data in json]
 
     def get_live_stream_url(self, device_id, session_id):
         return f"{URL_WATCHLIVE_BASE}{device_id}/{session_id}/stream.m3u8"
