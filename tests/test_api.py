@@ -6,6 +6,7 @@ import pytest
 import requests_mock
 
 from canary.api import Api
+from canary.auth import Auth
 from canary.const import (
     URL_LOGIN_API,
     URL_MODES_API,
@@ -65,7 +66,8 @@ class TestApi(unittest.TestCase):
     def test_locations(self, mock):
         """Test the Canary locations API."""
         _setup_responses(mock)
-        api = Api("user", "pass")
+        auth = Auth({"username": "user", "password": "pass"})
+        api = Api(auth)
 
         locations = api.get_locations()
         self.assertEqual(2, len(locations))
@@ -93,7 +95,8 @@ class TestApi(unittest.TestCase):
     def test_location_with_motion_entry(self, mock):
         """Test the Canary entries API."""
         _setup_responses(mock)
-        api = Api("user", "pass")
+        auth = Auth({"username": "user", "password": "pass"})
+        api = Api(auth)
 
         entries = api.get_entries(70001)
         self.assertEqual(2, len(entries))
@@ -116,7 +119,8 @@ class TestApi(unittest.TestCase):
     def test_device_with_readings(self, mock):
         """Test the Canary entries API."""
         _setup_responses(mock)
-        api = Api("user", "pass")
+        auth = Auth({"username": "user", "password": "pass"})
+        api = Api(auth)
 
         readings = api.get_readings(80001)
         self.assertEqual(6, len(readings))

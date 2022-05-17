@@ -42,12 +42,10 @@ class TestLiveStreamApi(unittest.TestCase):
     def test_login(self, mock):
         """Test login for canary live stream api"""
         _setup_responses(mock)
-        api = LiveStreamApi("user", "pass")
-
-        api.login()
+        api = LiveStreamApi(token="123456abcdef")
 
         with self.subTest("stores the token on the api object"):
-            self.assertEqual(api._token, "ffffffffffffffffffffffffffffffffffffffff")
+            self.assertEqual(api._token, "123456abcdef")
 
         with self.subTest("stores ssesyranac cookie on the api object"):
             self.assertEqual(api._ssesyranac, "ssesyranac")

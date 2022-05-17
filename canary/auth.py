@@ -116,8 +116,6 @@ class Auth:
         if self.check_key_required():
             # MFA is enabled...
             headers["content-type"] = "application/json"
-            # headers["origin"] = "https://my.canary.is"
-            # headers["referer"] = "https://my.canary.is/login"
             headers[HEADER_XSRF_TOKEN] = self._xsrf_token
             try:
                 response = requests.post(
@@ -169,11 +167,6 @@ class Auth:
             raise CanaryBadResponse from error
         return None
 
-    def startup(self):
-        """Initialize tokens for communication."""
-        self.validate_login()
-        self.pre_login()
-
     def check_key_required(self):
         """Check if 2FA key is required."""
         try:
@@ -189,14 +182,6 @@ class Auth:
             COOKIE_XSRF_TOKEN: self._xsrf_token,
             COOKIE_SSESYRANAC: self._ssesyranac,
         }
-
-
-class TokenRefreshFailed(Exception):
-    """Class to throw failed refresh exception."""
-
-
-class LoginError(Exception):
-    """Class to throw failed login exception."""
 
 
 class CanaryBadResponse(Exception):
