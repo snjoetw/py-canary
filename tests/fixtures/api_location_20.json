@@ -1,0 +1,116 @@
+{
+  "id": 20,
+  "resource_uri": "/v1/locations/20/",
+  "customers": [
+    {
+      "avatar": {
+        "id": 202,
+        "resource_uri": "/v1/avatars/202/",
+        "customer": "/v1/customers/42/",
+        "image": "https://cnry-prod-avatars.s3.amazonaws.com/avatars/avatar.png",
+        "thumbnail_url": "https://cnry-prod-avatars.s3.amazonaws.com/avatars/avatar.png?AWSAccessKeyId=ASIA&Signature=u&x-amz-security-token=Fw&Expires=1040234833"
+      },
+      "celsius": false,
+      "country_identifier": "US",
+      "created": "2016-01-12T03:18:55Z",
+      "current_location": "/v1/locations/20/",
+      "date_joined": "2016-01-12T03:18:55Z",
+      "default_location": null,
+      "email": "test@ex-ampl-e.com",
+      "first_name": "Bob",
+      "id": 42,
+      "is_active": true,
+      "last_location_change": "2022-05-17T15:24:14Z",
+      "last_name": "Dole",
+      "notification_preference": "push",
+      "notification_sound": "canary.wav",
+      "notifications_enabled": true,
+      "phone": "(800) 555-1213",
+      "unread_notifications_count": 2,
+      "username": "test@ex-ampl-e.com",
+      "last_used_ip": "192.168.1.2",
+      "language_preference": "en",
+      "has_seen_data_share_prompt": true,
+      "active_alarm": false,
+      "phone_verified": false,
+      "resource_uri": "/v1/customers/42/"
+    }
+  ],
+  "customers_present": [
+    "/v1/customers/42/"
+  ],
+  "devices": [
+    {
+      "id": 80005,
+      "resource_uri": "/v1/devices/ffffffffffffffffffffffffffffffff/",
+      "location": "/v1/locations/20/",
+      "mode": "/v1/modes/7/",
+      "activation_status": "activated",
+      "activation_token": null,
+      "current_ota_download_attempts": 6,
+      "device_activated": true,
+      "device_type": {
+        "id": 1,
+        "name": "Canary Pro"
+      },
+      "image_url": null,
+      "last_video_received": null,
+      "online": true,
+      "ota_attempts": 6,
+      "ota_progress": 0,
+      "ota_start_time": "2021-02-15T23:15:47Z",
+      "ota_status": "complete",
+      "serial_number": "C00000000000",
+      "uuid": "ffffffffffffffffffffffffffffffff",
+      "video_recording": false,
+      "watch_live": true,
+      "name": "Living Room",
+      "firmware_version": "v0.2.49",
+      "application_version": "v5.6.2",
+      "siren_active": false,
+      "video_uploading": true,
+      "setup_complete": true,
+      "audio_cable_status": "plugged_out",
+      "activation_attempts": 1,
+      "created": "2016-01-12T03:23:45Z"
+    }
+  ],
+  "insurance_policy": null,
+  "locationOwner": "/v1/customers/42/",
+  "mode": {
+    "resource_uri": "/v1/modes/4/",
+    "id": 4,
+    "name": "home"
+  },
+  "auto_mode": {
+    "resource_uri": "/v1/modes/1/",
+    "id": 1,
+    "name": "disarmed"
+  },
+  "geofence_radius": 150,
+  "lat": "44.000000",
+  "lng": "-120.000000",
+  "created_at": "2016-01-12T03:19:21Z",
+  "name": "Vacation Home",
+  "timezone": "America/Los_Angeles",
+  "entry_instructions": "",
+  "address": "1313 Mockingbird Ln",
+  "address2": "",
+  "city": "Universal City",
+  "state": "CA",
+  "zip": "91608",
+  "country": "United States",
+  "country_code": "US",
+  "is_private": false,
+  "auto_mode_enabled": true,
+  "night_mode_enabled": true,
+  "verified": true,
+  "address_verified": false,
+  "last_mode_change": "2021-01-17T15:14:14.481543Z",
+  "network_connection": null,
+  "current_mode": {
+    "resource_uri": "/v1/modes/7/",
+    "id": 7,
+    "name": "standby"
+  }
+}
