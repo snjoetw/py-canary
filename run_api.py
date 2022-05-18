@@ -47,14 +47,16 @@ def print_entries(entries):
             entry.start_time,
         )
         for thumbnail in entry.thumbnails:
-            logger.info("-- %s", "was set" if REDACT else thumbnail.image_url)
+            logger.info(
+                "-- thumbnail image: %s", "was set" if REDACT else thumbnail.image_url
+            )
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        format="%(name)s - %(levelname)s - %(message)s",
     )
     logger = logging.getLogger(__name__)
     # set logging level

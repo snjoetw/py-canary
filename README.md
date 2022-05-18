@@ -65,7 +65,29 @@ specifically to support the [Canary component](https://home-assistant.io/compone
 # Quick Start
 The simplest way to use this package from a terminal is to run the sample script ``python3 run_api.py``
 which will prompt for your Canary username and password, as well as a 2FA code if your account is set up
-to use one, and then log you in.
+to use one, and then log you in and display data about your devices, as shown below in REDACT mode:
+
+```text
+__main__ - INFO - device Office is a Canary Pro and is online
+__main__ - INFO - -- watch live? True
+__main__ - INFO - -- firmware vv5.6.2
+__main__ - INFO - -- serial number C10
+__main__ - INFO - Getting the day's entries...
+__main__ - INFO - id: bdd - device_uuid: 64c1 - date: 2022-05-18 17:14:49+00:00
+__main__ - INFO - -- thumbnail image: was set
+__main__ - INFO - id: bdd - device_uuid: 64c1 - date: 2022-05-18 15:41:19+00:00
+__main__ - INFO - -- thumbnail image: was set
+__main__ - INFO - Getting a single entry by device...
+__main__ - INFO - id: bdd - device_uuid: 64c1 - date: 2022-05-18 17:14:49+00:00
+__main__ - INFO - -- thumbnail image: was set
+__main__ - INFO - Latest Readings by device...
+__main__ - INFO - device Office - sensor: AIR_QUALITY value: 0.781187006133668
+__main__ - INFO - device Office - sensor: HUMIDITY value: 53.11247176312386
+__main__ - INFO - device Office - sensor: TEMPERATURE value: 21.020830884892888
+__main__ - INFO - device Office - sensor: WIFI value: -40
+```
+
+For your own scripts, start with the following snippets.
 
 ```python
 from canary.api import Api
