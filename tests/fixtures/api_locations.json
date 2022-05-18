@@ -55,7 +55,8 @@
           "name": "Dining Room",
           "online": true,
           "siren_active": false,
-          "video_uploading": false
+          "video_uploading": false,
+          "serial_number": "Z222222"
         },
         {
           "activation_attempts": 1,
@@ -73,7 +74,8 @@
           "name": "Front Door",
           "online": false,
           "siren_active": false,
-          "video_uploading": true
+          "video_uploading": true,
+          "serial_number": "Z222223"
         },
         {
           "activation_attempts": 2,
@@ -91,7 +93,8 @@
           "name": "Bedroom",
           "online": false,
           "siren_active": false,
-          "video_uploading": true
+          "video_uploading": true,
+          "serial_number": "Z222224"
         },
         {
           "activation_attempts": 1,
@@ -109,7 +112,8 @@
           "name": "Front Door",
           "online": true,
           "siren_active": false,
-          "video_uploading": false
+          "video_uploading": false,
+          "serial_number": "Z2222225"
         }
       ],
       "id": 70001,
@@ -161,7 +165,8 @@
           "name": "Office",
           "online": true,
           "siren_active": false,
-          "video_uploading": true
+          "video_uploading": true,
+          "serial_number": "Y5555555"
         }
       ],
       "id": 70002,
