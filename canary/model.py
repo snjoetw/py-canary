@@ -100,6 +100,9 @@ class Device:
         self._device_mode = None
         self._is_online = data["online"]
         self._device_type = data["device_type"]
+        self._serial_number = data["serial_number"]
+        self._watch_live = data.get("watch_live", False)
+        self._application_version = data.get("application_version", "unknown")
 
     @property
     def device_id(self):
@@ -124,6 +127,19 @@ class Device:
     @property
     def device_type(self):
         return self._device_type
+
+    @property
+    def serial_number(self):
+        return self._serial_number
+
+    @property
+    def watch_live(self):
+        return self._watch_live
+
+    @property
+    def firmware_version(self):
+        """Canary App reports the "application version" as the firmware version"""
+        return self._application_version
 
 
 class Reading:

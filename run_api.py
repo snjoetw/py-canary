@@ -8,7 +8,8 @@ from canary.auth import Auth
 # This will open a watch live session to get the URL and allow time
 # to open the m3u8 file in VLC
 LIVE_STREAM = False
-REDACT = False
+# This will redact out sensitive data for sending data to devs
+REDACT = True
 
 
 def write_config(canary: Api):
@@ -35,6 +36,18 @@ def read_settings():
         except KeyError:
             json_object["token"] = None
         return json_object
+
+
+def print_entries(entries):
+    for entry in entries:
+        logger.info(
+            "id: %s - device_uuid: %s - date: %s",
+            entry.entry_id[-3:] if REDACT else entry.entry_id,
+            entry.device_uuids[0][-4:] if REDACT else entry.device_uuids[0],
+            entry.start_time,
+        )
+        for thumbnail in entry.thumbnails:
+            logger.info("-- %s", "was set" if REDACT else thumbnail.image_url)
 
 
 if __name__ == "__main__":
@@ -67,6 +80,12 @@ if __name__ == "__main__":
                 device.device_type["name"],
                 "online" if device.is_online else "offline",
             )
+            logger.info("-- watch live? %s", device.watch_live)
+            logger.info("-- firmware v%s", device.firmware_version)
+            logger.info(
+                "-- serial number %s",
+                device.serial_number[0:3] if REDACT else device.serial_number,
+            )
             if device.is_online:
                 readings_by_device_id[device.device_id] = canary.get_latest_readings(
                     device.device_id
@@ -95,27 +114,11 @@ if __name__ == "__main__":
 
         logger.info("Getting the day's entries...")
         entries = canary.get_entries(location_id=location_id)
-        for entry in entries:
-            logger.info(
-                "id: %s - device_uuid: %s - date: %s",
-                entry.entry_id,
-                entry.device_uuids[0],
-                entry.start_time,
-            )
-            for thumbnail in entry.thumbnails:
-                logger.info("-- %s", thumbnail.image_url)
+        print_entries(entries)
 
         logger.info("Getting a single entry by device...")
         entries = canary.get_latest_entries(location_id)
-        for entry in entries:
-            logger.info(
-                "id: %s - device_uuid: %s - date: %s",
-                entry.entry_id,
-                entry.device_uuids[0],
-                entry.start_time,
-            )
-            for thumbnail in entry.thumbnails:
-                logger.info("-- %s", thumbnail.image_url)
+        print_entries(entries)
 
         logger.info("Latest Readings by device...")
         for key in readings_by_device_id:
