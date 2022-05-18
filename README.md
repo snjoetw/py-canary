@@ -1,12 +1,11 @@
-# py-canary [![Build Status](https://travis-ci.org/snjoetw/py-canary.svg?branch=master)](https://travis-ci.org/snjoetw/py-canary)[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)![PyPI](https://img.shields.io/pypi/v/py-canary)
+# py-canary [![Build Status](https://travis-ci.org/snjoetw/py-canary.svg?branch=master)](https://travis-ci.org/snjoetw/py-canary)[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)![PyPI](https://img.shields.io/pypi/v/py-canary)
 Python API for Canary Security Camera.  This is used in [Home Assistant](https://home-assistant.io) but should be generic enough that can be used elsewhere.
 
 **Disclaimer:**
 Published under the MIT license - See LICENSE file for more details.
 
-Canary Pro, Canary Flex and Canary View, see www.canary.is for more information.
+Canary Pro, Canary Flex and Canary View cameras are supported, see www.canary.is for more information.
 We are in no way affiliated with Canary Connect, Inc.
-
 
 ## Breaking Change
 Version 0.6.0 changes the way the Api and LiveStreamApi classes are created.
@@ -40,7 +39,6 @@ canary.auth.login()
 
 live_stream = LiveStreamApi(token=canary.auth.token)
 ```
-
 
 ## Installation
 ``pip install py-canary``
@@ -102,6 +100,5 @@ canary = Api(auth)
 canary.auth.otp = "<otp code>"
 canary.auth.login()
 ```
-
 
 Since you will not be prompted for any 2FA pin, you must wait to proceed until the OTP code is set in auth.
