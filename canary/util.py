@@ -1,13 +1,14 @@
 """Tools and utility calls for py-canary."""
-import logging
 from getpass import getpass
+import logging
+
 import requests
 
 from canary.const import (
-    HEADER_USER_AGENT,
-    HEADER_VALUE_USER_AGENT,
     HEADER_AUTHORIZATION,
+    HEADER_USER_AGENT,
     HEADER_VALUE_AUTHORIZATION,
+    HEADER_VALUE_USER_AGENT,
     TIMEOUT,
 )
 

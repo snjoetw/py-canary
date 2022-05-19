@@ -1,8 +1,11 @@
 HEADER_AUTHORIZATION = "Authorization"
 HEADER_USER_AGENT = "User-Agent"
-
 HEADER_VALUE_AUTHORIZATION = "Bearer"
 HEADER_VALUE_USER_AGENT = "Canary/5.9.0 (iPhone; iOS 15.4.1; Scale/3.00)"
+HEADER_XSRF_TOKEN = "X-XSRF-TOKEN"
+
+COOKIE_XSRF_TOKEN = "XSRF-TOKEN"
+COOKIE_SSESYRANAC = "ssesyranac"
 
 TIMEOUT = 10
 
@@ -10,9 +13,7 @@ URL_LOGIN_PAGE = "https://my.canary.is/manifest.json"
 URL_WATCHLIVE_BASE = "https://my.canary.is/api/watchlive/"
 URL_LOGIN_API = "https://api-prod.canaryis.com/o/access_token/"
 URL_ENTRIES_API = "https://my.canary.is/api/entries/tl2/"
-# URL_LOGIN_API = "https://api.canaryis.com/o/access_token/"
 URL_LOCATIONS_API = "https://api.canaryis.com/v1/locations/"
-URL_LOCATION_API = "https://api.canaryis.com/v1/locations/"
 URL_MODES_API = "https://api.canaryis.com/v1/modes/"
 URL_READINGS_API = "https://api.canaryis.com/v1/readings/"
 
@@ -45,8 +46,3 @@ LOCATION_STATE_PRIVACY = "privacy"
 LOCATION_STATE_STANDBY = "standby"
 
 RECORDING_STATES = [LOCATION_STATE_ARMED, LOCATION_STATE_DISARMED]
-
-COOKIE_XSRF_TOKEN = "XSRF-TOKEN"
-COOKIE_SSESYRANAC = "ssesyranac"
-
-HEADER_XSRF_TOKEN = "X-XSRF-TOKEN"

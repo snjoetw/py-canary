@@ -1,22 +1,21 @@
+from datetime import date, datetime, timedelta
 import logging
-from datetime import datetime, timedelta, date
 
 from canary import util
+from canary.auth import Auth
 from canary.const import (
-    URL_MODES_API,
     ATTR_OBJECTS,
-    URL_LOCATIONS_API,
-    URL_LOCATION_API,
     DATETIME_FORMAT,
-    URL_READINGS_API,
     DATETIME_MS_FORMAT,
     DATETIME_MS_FORMAT_NOTZ,
     TIMEOUT,
     URL_ENTRIES_API,
+    URL_LOCATIONS_API,
+    URL_MODES_API,
+    URL_READINGS_API,
 )
 from canary.live_stream_api import LiveStreamApi, LiveStreamSession
-from canary.model import Mode, Location, Reading, Entry
-from canary.auth import Auth
+from canary.model import Entry, Location, Mode, Reading
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +31,7 @@ class Api:
             self._auth.pre_login()
             self._auth.login()
 
+        # if auth is not waiting on otp
         self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
 
     def get_modes(self):
@@ -43,12 +43,12 @@ class Api:
         return [Location(data, self._modes_by_name) for data in json]
 
     def get_location(self, location_id):
-        url = f"{URL_LOCATION_API}{location_id}/"
+        url = f"{URL_LOCATIONS_API}{location_id}/"
         json = util.call_api("get", url, self._auth).json()
         return Location(json, self._modes_by_name)
 
     def set_location_mode(self, location_id, mode_name, is_private=False):
-        url = f"{URL_LOCATION_API}{location_id}/"
+        url = f"{URL_LOCATIONS_API}{location_id}/"
         util.call_api(
             "patch",
             url,

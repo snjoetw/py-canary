@@ -1,7 +1,7 @@
-from enum import Enum
 from datetime import datetime, timezone
+from enum import Enum
 
-from canary.const import RECORDING_STATES, DATETIME_FORMAT
+from canary.const import DATETIME_FORMAT, RECORDING_STATES
 
 
 class Customer:

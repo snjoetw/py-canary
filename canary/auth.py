@@ -3,25 +3,26 @@ import logging
 
 import requests
 from requests import exceptions
+
 from canary import util
 from canary.const import (
-    HEADER_VALUE_USER_AGENT,
-    TIMEOUT,
-    HEADER_USER_AGENT,
+    ATTR_CLIENT_ID,
+    ATTR_GRANT_TYPE,
+    ATTR_PASSWORD,
+    ATTR_SCOPE,
     ATTR_TOKEN,
     ATTR_USERNAME,
-    ATTR_PASSWORD,
-    ATTR_CLIENT_ID,
     ATTR_VALUE_CLIENT_ID,
-    ATTR_GRANT_TYPE,
     ATTR_VALUE_GRANT_TYPE,
-    ATTR_SCOPE,
     ATTR_VALUE_SCOPE,
+    COOKIE_SSESYRANAC,
+    COOKIE_XSRF_TOKEN,
+    HEADER_USER_AGENT,
+    HEADER_VALUE_USER_AGENT,
+    HEADER_XSRF_TOKEN,
+    TIMEOUT,
     URL_LOGIN_API,
     URL_LOGIN_PAGE,
-    COOKIE_XSRF_TOKEN,
-    COOKIE_SSESYRANAC,
-    HEADER_XSRF_TOKEN,
 )
 
 _LOGGER = logging.getLogger(__name__)

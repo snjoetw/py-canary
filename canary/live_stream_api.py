@@ -4,16 +4,16 @@ import requests
 from requests import HTTPError
 
 from canary.const import (
-    URL_LOGIN_PAGE,
-    COOKIE_XSRF_TOKEN,
-    COOKIE_SSESYRANAC,
-    URL_WATCHLIVE_BASE,
+    ATTR_DEVICE_UUID,
     ATTR_SESSION_ID,
-    HEADER_XSRF_TOKEN,
+    COOKIE_SSESYRANAC,
+    COOKIE_XSRF_TOKEN,
     HEADER_AUTHORIZATION,
     HEADER_VALUE_AUTHORIZATION,
-    ATTR_DEVICE_UUID,
+    HEADER_XSRF_TOKEN,
     TIMEOUT,
+    URL_LOGIN_PAGE,
+    URL_WATCHLIVE_BASE,
 )
 
 _LOGGER = logging.getLogger(__name__)
