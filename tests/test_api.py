@@ -8,17 +8,17 @@ import requests_mock
 from canary.api import Api
 from canary.auth import Auth
 from canary.const import (
-    URL_LOGIN_API,
-    URL_MODES_API,
-    URL_LOCATIONS_API,
-    URL_READINGS_API,
-    URL_LOGIN_PAGE,
-    COOKIE_XSRF_TOKEN,
     COOKIE_SSESYRANAC,
-    URL_LOCATION_API,
+    COOKIE_XSRF_TOKEN,
+    URL_LOCATIONS_API,
+    URL_LOGIN_API,
+    URL_LOGIN_PAGE,
+    URL_MODES_API,
+    URL_READINGS_API,
     URL_WATCHLIVE_BASE,
 )
 from canary.model import SensorType
+
 from tests import mock_device
 
 COOKIE_XSRF_VAL = "xsrf"
@@ -64,11 +64,11 @@ def _setup_responses(mock, enable_2fa=False):
     mock.register_uri("GET", URL_LOCATIONS_API, text=load_fixture("api_locations.json"))
 
     mock.register_uri(
-        "GET", f"{URL_LOCATION_API}20/", text=load_fixture("api_location_20.json")
+        "GET", f"{URL_LOCATIONS_API}20/", text=load_fixture("api_location_20.json")
     )
 
     mock.register_uri(
-        "PATCH", f"{URL_LOCATION_API}20/", text=load_fixture("api_location_20.json")
+        "PATCH", f"{URL_LOCATIONS_API}20/", text=load_fixture("api_location_20.json")
     )
 
     mock.register_uri(
