@@ -5,8 +5,6 @@ reports=no
 # locally-disabled - it spams too much
 # duplicate-code - unavoidable
 # cyclic-import - doesn't test if both import on load
-# abstract-class-little-used - prevents from setting right foundation
-# abstract-class-not-used - is flaky, should not show up but does
 # unused-argument - generic callbacks and setup methods create a lot of warnings
 # global-statement - used for the on-demand requirement installation
 # redefined-variable-type - this is Python, we're duck typing!
@@ -18,11 +16,8 @@ disable=
   locally-disabled,
   duplicate-code,
   cyclic-import,
-  # abstract-class-little-used,
-  # abstract-class-not-used,
   unused-argument,
   global-statement,
-  # redefined-variable-type,
   too-many-arguments,
   too-many-branches,
   too-many-instance-attributes,
@@ -33,7 +28,6 @@ disable=
   too-many-lines,
   too-few-public-methods,
   abstract-method,
-  # no-self-use,
   missing-docstring
 
 [EXCEPTIONS]

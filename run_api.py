@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import re
 
 from canary.api import Api
@@ -7,35 +8,40 @@ from canary.auth import Auth
 
 # This will open a watch live session to get the URL and allow time
 # to open the m3u8 file in VLC
+from canary.util import prompt_login_data
+
 LIVE_STREAM = False
 # This will redact out sensitive data for sending data to devs
 REDACT = True
 
 
 def write_config(canary: Api):
-    # Data to be written
     dictionary = {
         "username": canary._auth.login_attributes["username"],
         "password": canary._auth.login_attributes["password"],
         "token": canary._auth.login_attributes["token"],
     }
-    # Serializing json
     json_object = json.dumps(dictionary, indent=4)
-    # Writing to sample.json
+
+    if not os.path.exists("./env"):
+        os.makedirs("./env")
+
     with open("./env/variables.json", "w") as outfile:
         outfile.write(json_object)
 
 
 def read_settings():
-    with open("./env/variables.json") as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
-        try:
-            if json_object["token"] == "":
+    try:
+        with open("./env/variables.json") as openfile:
+            json_object = json.load(openfile)
+            try:
+                if json_object["token"] == "":
+                    json_object["token"] = None
+            except KeyError:
                 json_object["token"] = None
-        except KeyError:
-            json_object["token"] = None
-        return json_object
+            return json_object
+    except FileNotFoundError:
+        return None
 
 
 def print_entries(entries):
@@ -59,9 +65,10 @@ if __name__ == "__main__":
         format="%(name)s - %(levelname)s - %(message)s",
     )
     logger = logging.getLogger(__name__)
-    # set logging level
 
     settings = read_settings()
+    if not settings:
+        settings = prompt_login_data({"username": None, "password": None})
 
     auth = Auth(login_data=settings, no_prompt=True)
     canary = Api(auth)
