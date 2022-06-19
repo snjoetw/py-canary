@@ -242,3 +242,11 @@ class Mode:
     @property
     def resource_uri(self):
         return self._resource_uri
+
+
+class CanaryBadResponse(Exception):
+    """Class to throw bad json response exception."""
+
+
+class UnauthorizedError(Exception):
+    """Class to throw an unauthorized access error."""

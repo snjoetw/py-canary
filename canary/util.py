@@ -1,10 +1,12 @@
 """Tools and utility calls for py-canary."""
+from datetime import date, datetime
 from getpass import getpass
 import logging
 
 import requests
 
 from canary.const import (
+    DATETIME_MS_FORMAT_NOTZ,
     HEADER_AUTHORIZATION,
     HEADER_USER_AGENT,
     HEADER_VALUE_AUTHORIZATION,
@@ -54,3 +56,13 @@ def api_headers(token: str):
         HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
         HEADER_AUTHORIZATION: f"{HEADER_VALUE_AUTHORIZATION} {token}",
     }
+
+
+def get_todays_date_range_utc():
+    utc_offset = datetime.utcnow() - datetime.now()
+    today = date.today()
+    beginning = today.strftime("%Y-%m-%d 00:00:00.0001")
+    utc_beginning = datetime.strptime(beginning, DATETIME_MS_FORMAT_NOTZ) + utc_offset
+    ending = today.strftime("%Y-%m-%d 23:59:59.99999")
+    utc_ending = datetime.strptime(ending, DATETIME_MS_FORMAT_NOTZ) + utc_offset
+    return utc_beginning, utc_ending

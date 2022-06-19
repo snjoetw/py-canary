@@ -1,21 +1,36 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import logging
+
+import requests
 
 from canary import util
 from canary.auth import Auth
 from canary.const import (
+    ATTR_CLIENT_ID,
+    ATTR_GRANT_TYPE,
     ATTR_OBJECTS,
+    ATTR_PASSWORD,
+    ATTR_SCOPE,
+    ATTR_USERNAME,
+    ATTR_VALUE_CLIENT_ID,
+    ATTR_VALUE_GRANT_TYPE,
+    ATTR_VALUE_SCOPE,
     DATETIME_FORMAT,
     DATETIME_MS_FORMAT,
-    DATETIME_MS_FORMAT_NOTZ,
+    HEADER_USER_AGENT,
+    HEADER_VALUE_USER_AGENT,
+    HEADER_XSRF_TOKEN,
     TIMEOUT,
     URL_ENTRIES_API,
     URL_LOCATIONS_API,
+    URL_LOGIN_API,
+    URL_LOGIN_PAGE,
     URL_MODES_API,
     URL_READINGS_API,
 )
 from canary.live_stream_api import LiveStreamApi, LiveStreamSession
-from canary.model import Entry, Location, Mode, Reading
+from canary.model import CanaryBadResponse, Entry, Location, Mode, Reading
+from canary.util import get_todays_date_range_utc
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,11 +43,81 @@ class Api:
         self._live_stream_api = None
 
         if self._auth.login_attributes["token"] is None:
-            self._auth.pre_login()
-            self._auth.login()
+            self._pre_login()
+            self.login()
 
         # if auth is not waiting on otp
         self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
+
+    def _pre_login(self):
+        response = requests.get(URL_LOGIN_PAGE)
+        self._auth.parse_cookies(response.cookies)
+
+    def login(self):
+        self._auth.validate_login()
+
+        self._pre_login()
+
+        headers = {
+            HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
+            "accept": "application/json",
+        }
+        if self._auth.otp:
+            headers["X-OTP"] = self._auth.otp
+
+        response = requests.post(
+            URL_LOGIN_API,
+            {
+                ATTR_USERNAME: self._auth.username,
+                ATTR_PASSWORD: self._auth.password,
+                ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
+                ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
+                ATTR_SCOPE: ATTR_VALUE_SCOPE,
+            },
+            timeout=TIMEOUT,
+            headers=headers,
+        )
+
+        _LOGGER.debug(
+            "Received login response: %d, %s", response.status_code, response.content
+        )
+
+        self._auth.login_response = self._auth.validate_response(response, True)
+        # response.raise_for_status()
+
+        if self._auth.check_key_required():
+            # MFA is enabled...
+            headers["content-type"] = "application/json"
+            headers[HEADER_XSRF_TOKEN] = self._auth.xsrf_token
+            try:
+                response = requests.post(
+                    "https://my.canary.is/mfa/challenge/login",
+                    json={
+                        ATTR_USERNAME: self._auth.username,
+                        ATTR_PASSWORD: self._auth.password,
+                    },
+                    timeout=5,
+                    headers=headers,
+                    cookies=self._auth.api_cookies(),
+                )
+                _LOGGER.debug(
+                    "Received login response: %d, %s",
+                    response.status_code,
+                    response.content,
+                )
+            except requests.Timeout:
+                pass
+            except requests.exceptions.RequestException as error:
+                raise CanaryBadResponse from error
+
+            if not self._auth.no_prompt:
+                self._auth.otp = input("OTP:")
+
+                self.login()
+            return
+
+        self._auth.otp = None
+        self._auth.set_login_token()
 
     def get_modes(self):
         json = util.call_api("get", URL_MODES_API, self._auth).json()[ATTR_OBJECTS]
@@ -89,7 +174,7 @@ class Api:
         return readings_by_type.values()
 
     def get_entries(self, location_id):
-        utc_beginning, utc_ending = self._get_todays_date_range_utc()
+        utc_beginning, utc_ending = get_todays_date_range_utc()
 
         json = util.call_api(
             "get",
@@ -118,17 +203,6 @@ class Api:
         if self._live_stream_api is None:
             self._live_stream_api = LiveStreamApi(self._auth.token, self._timeout)
         return LiveStreamSession(self._live_stream_api, device)
-
-    def _get_todays_date_range_utc(self):
-        utc_offset = datetime.utcnow() - datetime.now()
-        today = date.today()
-        beginning = today.strftime("%Y-%m-%d 00:00:00.0001")
-        utc_beginning = (
-            datetime.strptime(beginning, DATETIME_MS_FORMAT_NOTZ) + utc_offset
-        )
-        ending = today.strftime("%Y-%m-%d 23:59:59.99999")
-        utc_ending = datetime.strptime(ending, DATETIME_MS_FORMAT_NOTZ) + utc_offset
-        return utc_beginning, utc_ending
 
     @property
     def auth_token(self):  # -> str | None:

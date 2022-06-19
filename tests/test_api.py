@@ -253,6 +253,6 @@ class TestApi(unittest.TestCase):
         api._auth.otp = "1234"
         self.assertEqual(auth.otp, "1234")
         OTP_USED = True
-        auth.login()
+        api.login()
 
         self.assertIsNone(auth.otp)
