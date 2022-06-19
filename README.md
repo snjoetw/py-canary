@@ -40,6 +40,16 @@ canary.login()
 live_stream = LiveStreamApi(token=canary.auth.token)
 ```
 
+## Roadmap for Next Release (0.60?)
+
+- [x] Add more metadata to devices (serial number, firmware version)
+- [ ] Add 2FA support
+  - [x] ... to py-canary
+  - [ ] ... into Home Assistant (verifies flow works as expected)
+
+See the [open issues](https://github.com/snjoetw/py-canary/issues) for a full list of proposed features
+(and known issues).
+
 ## Installation
 ``pip install py-canary``
 
