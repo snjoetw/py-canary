@@ -35,7 +35,7 @@ canary = Api(auth)
 # if 2FA is enabled a code will be sent out.
 # Update the canary.auth.otp property to the code received and login again.
 canary.auth.otp = "<otp code>"
-canary.auth.login()
+canary.login()
 
 live_stream = LiveStreamApi(token=canary.auth.token)
 ```
@@ -120,7 +120,7 @@ canary = Api(auth)
 # if 2FA is enabled a code will be sent out.
 # Update the canary.auth.otp property to the code received and login again.
 canary.auth.otp = "<otp code>"
-canary.auth.login()
+canary.login()
 ```
 
 Since you will not be prompted for any 2FA pin, you must wait to proceed until the OTP code is set in auth.
