@@ -41,13 +41,9 @@ class Api:
         self._timeout = timeout
         self._modes_by_name = {}
         self._live_stream_api = None
+        self._mfa_required = False
 
-        if self._auth.login_attributes["token"] is None:
-            self._pre_login()
-            self.login()
-
-        # if auth is not waiting on otp
-        self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
+        self.login()
 
     def _pre_login(self):
         response = requests.get(URL_LOGIN_PAGE)
@@ -56,68 +52,82 @@ class Api:
     def login(self):
         self._auth.validate_login()
 
-        self._pre_login()
+        if self._auth.login_attributes["token"] is None:
+            self._pre_login()
 
-        headers = {
-            HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
-            "accept": "application/json",
-        }
-        if self._auth.otp:
-            headers["X-OTP"] = self._auth.otp
+            headers = {
+                HEADER_USER_AGENT: HEADER_VALUE_USER_AGENT,
+                "accept": "application/json",
+            }
+            if self._auth.otp:
+                headers["X-OTP"] = self._auth.otp
+                # we have used the key; reset value
+                self._mfa_required = False
 
-        response = requests.post(
-            URL_LOGIN_API,
-            {
-                ATTR_USERNAME: self._auth.username,
-                ATTR_PASSWORD: self._auth.password,
-                ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
-                ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
-                ATTR_SCOPE: ATTR_VALUE_SCOPE,
-            },
-            timeout=TIMEOUT,
-            headers=headers,
-        )
+            response = requests.post(
+                URL_LOGIN_API,
+                {
+                    ATTR_USERNAME: self._auth.username,
+                    ATTR_PASSWORD: self._auth.password,
+                    ATTR_CLIENT_ID: ATTR_VALUE_CLIENT_ID,
+                    ATTR_GRANT_TYPE: ATTR_VALUE_GRANT_TYPE,
+                    ATTR_SCOPE: ATTR_VALUE_SCOPE,
+                },
+                timeout=TIMEOUT,
+                headers=headers,
+            )
 
-        _LOGGER.debug(
-            "Received login response: %d, %s", response.status_code, response.content
-        )
+            _LOGGER.debug(
+                "Received login response: %d, %s",
+                response.status_code,
+                response.content,
+            )
 
-        self._auth.login_response = self._auth.validate_response(response, True)
-        # response.raise_for_status()
+            self._auth.login_response = self._auth.validate_response(response, True)
+            # response.raise_for_status()
 
-        if self._auth.check_key_required():
-            # MFA is enabled...
-            headers["content-type"] = "application/json"
-            headers[HEADER_XSRF_TOKEN] = self._auth.xsrf_token
-            try:
-                response = requests.post(
-                    "https://my.canary.is/mfa/challenge/login",
-                    json={
-                        ATTR_USERNAME: self._auth.username,
-                        ATTR_PASSWORD: self._auth.password,
-                    },
-                    timeout=5,
-                    headers=headers,
-                    cookies=self._auth.api_cookies(),
-                )
-                _LOGGER.debug(
-                    "Received login response: %d, %s",
-                    response.status_code,
-                    response.content,
-                )
-            except requests.Timeout:
-                pass
-            except requests.exceptions.RequestException as error:
-                raise CanaryBadResponse from error
+            if self._auth.check_key_required():
+                # MFA is enabled... request the key via SMS
+                self._mfa_required = True
+                headers["content-type"] = "application/json"
+                headers[HEADER_XSRF_TOKEN] = self._auth.xsrf_token
+                try:
+                    response = requests.post(
+                        "https://my.canary.is/mfa/challenge/login",
+                        json={
+                            ATTR_USERNAME: self._auth.username,
+                            ATTR_PASSWORD: self._auth.password,
+                        },
+                        timeout=5,
+                        headers=headers,
+                        cookies=self._auth.api_cookies(),
+                    )
+                    _LOGGER.debug(
+                        "Received login response: %d, %s",
+                        response.status_code,
+                        response.content,
+                    )
+                except requests.Timeout:
+                    pass
+                except requests.exceptions.RequestException as error:
+                    raise CanaryBadResponse from error
 
-            if not self._auth.no_prompt:
-                self._auth.otp = input("OTP:")
+                if not self._auth.no_prompt:
+                    # if the command like prompt is on, ask for the OTP code and login
+                    # else, it's handled bu the consuming script and api.is_mfa_required
+                    self._auth.otp = input("OTP:")
 
-                self.login()
-            return
+                    self.login()
+                return
 
+            # only called if mfa is not required
+            self._auth.set_login_token()
+
+        # only called upon a successful login or if a token was passed in
         self._auth.otp = None
-        self._auth.set_login_token()
+
+        # load the modes used by the various cameras
+        self._modes_by_name = {mode.name: mode for mode in self.get_modes()}
 
     def get_modes(self):
         json = util.call_api("get", URL_MODES_API, self._auth).json()[ATTR_OBJECTS]
@@ -207,3 +217,7 @@ class Api:
     @property
     def auth_token(self):  # -> str | None:
         return self._auth.token
+
+    @property
+    def is_mfa_required(self) -> bool:
+        return self._mfa_required

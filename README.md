@@ -40,7 +40,7 @@ canary.login()
 live_stream = LiveStreamApi(token=canary.auth.token)
 ```
 
-## Roadmap for Next Release (0.60?)
+## Roadmap for Next Release (0.6.0)
 
 - [x] Add more metadata to devices (serial number, firmware version)
 - [ ] Add 2FA support
