@@ -62,6 +62,7 @@ create a py-canary directory in your home area:
 $ cd ~
 $ git clone https://github.com/snjoetw/py-canary.git
 $ cd py-canary
+$ git checkout feature/15-2fa-support
 $ rm -rf build dist
 $ python3 -m build
 $ pip3 install --upgrade dist/*.whl
