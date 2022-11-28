@@ -32,13 +32,16 @@ class LiveStreamApi:
             return
 
     def pre_login(self):
-        response = requests.get(URL_LOGIN_PAGE)
+        try:
+            response = requests.get(URL_LOGIN_PAGE, timeout=self._timeout)
 
-        xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
-        ssesyranac = response.cookies[COOKIE_SSESYRANAC]
+            xsrf_token = response.cookies[COOKIE_XSRF_TOKEN]
+            ssesyranac = response.cookies[COOKIE_SSESYRANAC]
 
-        self._ssesyranac = ssesyranac
-        self._xsrf_token = xsrf_token
+            self._ssesyranac = ssesyranac
+            self._xsrf_token = xsrf_token
+        except (requests.ConnectTimeout, requests.Timeout):
+            _LOGGER.exception("Unable to get pre-login data due to a timeout")
 
     def start_session(self, device_uuid):
         response = self._call_api(

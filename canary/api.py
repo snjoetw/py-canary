@@ -46,8 +46,11 @@ class Api:
         self.login()
 
     def _pre_login(self):
-        response = requests.get(URL_LOGIN_PAGE)
-        self._auth.parse_cookies(response.cookies)
+        try:
+            response = requests.get(URL_LOGIN_PAGE, timeout=self._timeout)
+            self._auth.parse_cookies(response.cookies)
+        except (requests.ConnectTimeout, requests.Timeout):
+            _LOGGER.exception("Unable to get pre-login data due to a timeout")
 
     def login(self):
         self._auth.validate_login()
