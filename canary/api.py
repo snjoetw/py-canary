@@ -99,7 +99,7 @@ class Api:
 
     def get_readings(self, device_id):
         end = datetime.utcnow()
-        start = end - timedelta(minutes=40)
+        start = end - timedelta(minutes=5)
         created_range = (
             f"{start.strftime(DATETIME_FORMAT)},{end.strftime(DATETIME_FORMAT)}"
         )
@@ -109,7 +109,7 @@ class Api:
             {
                 "created__range": created_range,
                 "device": device_id,
-                "resolution": "10m",
+                #  "resolution": "10m",
                 "limit": 0,
             },
         ).json()[ATTR_OBJECTS]
